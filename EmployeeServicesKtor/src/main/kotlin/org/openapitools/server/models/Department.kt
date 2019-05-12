@@ -20,11 +20,11 @@ package org.openapitools.server.models
  * @param employees
  */
 data class Department(
-        val id: kotlin.Long? = null,
-        val name: kotlin.String? = null,
-        val lead: kotlin.String? = null,
-        val description: kotlin.String? = null,
-        val employees: kotlin.Array<Employee>? = null
+        val id: Long? = null,
+        val name: String? = null,
+        val lead: String? = null,
+        val description: String? = null,
+        val employees: Array<Employee>? = null
 ) {
 
 }

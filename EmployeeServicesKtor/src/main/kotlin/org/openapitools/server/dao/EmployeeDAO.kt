@@ -8,6 +8,7 @@ object Employees : LongIdTable() {
     val email = varchar("email", 50)
     val phone = varchar("phone", 50)
     val jobtitle = varchar("jobtitle", 50)
+    val department = reference("department", Departments)
 }
 
 class EmployeeDAO(id: EntityID<Long>) : LongEntity(id) {
@@ -18,4 +19,5 @@ class EmployeeDAO(id: EntityID<Long>) : LongEntity(id) {
     var email by Employees.email
     var phone by Employees.phone
     var jobtitle by Employees.jobtitle
+    var department by DepartmentDAO referencedOn Employees.department
 }

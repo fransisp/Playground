@@ -8,35 +8,10 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.openapitools.server.dao.EmployeeDAO
-import org.openapitools.server.dao.Employees
+import org.openapitools.server.dao.*
 import org.openapitools.server.dao.Employees.empid
+import org.openapitools.server.models.Branch
 import org.openapitools.server.models.Employee
-
-object Users : IntIdTable() {
-    val name = varchar("name", 50).index()
-    val city = reference("city", Cities)
-    val age = integer("age")
-}
-
-class User(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<User>(Users)
-
-    var name by Users.name
-    var city by City referencedOn Users.city
-    var age by Users.age
-}
-
-object Cities : IntIdTable() {
-    val name = varchar("name", 50)
-}
-
-class City(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<City>(Cities)
-
-    var name by Cities.name
-    val users by User referrersOn Users.city
-}
 
 class ExposedDAOTest {
     @Test
@@ -46,34 +21,18 @@ class ExposedDAOTest {
         transaction {
             addLogger(StdOutSqlLogger)
 
-            SchemaUtils.create(Cities, Users, Employees)
+            SchemaUtils.create(Employees, Departments, Branches)
 
-            val stPete = City.new {
-                name = "St. Petersburg"
+            val branchTest = BranchDao.new { name = "Aparture"
+                lead = "GLADOS"
+                description = "is anybody safe?"
             }
 
-            val munich = City.new {
-                name = "Munich"
+            val deptTest = DepartmentDAO.new { name = "Research"
+                lead = "mr. nobody"
+                description = "cool things happens here"
+                branch = branchTest
             }
-
-            User.new {
-                name = "a"
-                city = stPete
-                age = 5
-            }
-
-            User.new {
-                name = "b"
-                city = stPete
-                age = 27
-            }
-
-            User.new {
-                name = "c"
-                city = munich
-                age = 42
-            }
-
 
             val empTest = EmployeeDAO.new {
                 name = "john doe"
@@ -81,16 +40,21 @@ class ExposedDAOTest {
                 email = "johndoe@acme.io"
                 jobtitle = "developer"
                 phone = "0123456789"
+                department = deptTest
             }
 
-            EmployeeDAO.find(Op.build { empid.eq("john.doe") })
+            assert(BranchDao.findById(1)?.equals(branchTest) ?: false)
+
+            assert(DepartmentDAO.findById(1)?.equals(deptTest) ?: false)
+
+            EmployeeDAO.find(Op.build { empid.eq(empTest.name) })
                     .forEach{
                         assertThat(it == empTest)
                     }
 
-            println("Cities: ${City.all().joinToString { it.name }}")
-            println("Users in ${stPete.name}: ${stPete.users.joinToString { it.name }}")
-            println("Adults: ${User.find { Users.age greaterEq 18 }.joinToString { it.name }}")
+            println("Branches: ${BranchDao.all().joinToString { it.name }}")
+            println("Departments in ${branchTest.name}: ${DepartmentDAO.all().joinToString { it.name }}")
+            println("Employees in ${deptTest.name}: ${deptTest.employees.joinToString { it.name }}")
         }
     }
 }
