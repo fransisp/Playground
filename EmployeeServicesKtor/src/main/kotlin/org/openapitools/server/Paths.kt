@@ -23,7 +23,7 @@ object Paths {
      */
     @KtorExperimentalLocationsAPI
     @Location("/employee/{employeeID}")
-    class getMemberInfo(val employeeID: kotlin.String)
+    class GetMemberInfo(val employeeID: String)
 
     /**
      * get the details of the given branch
@@ -32,7 +32,7 @@ object Paths {
      */
     @KtorExperimentalLocationsAPI
     @Location("/organisation/{branchID}")
-    class getBranchInfo(val branchID: kotlin.Int)
+    class getBranchInfo(val branchID: Int)
 
     /**
      * get the details of the given department
@@ -42,6 +42,6 @@ object Paths {
      */
     @KtorExperimentalLocationsAPI
     @Location("/organisation/{branchID}/department/{departmentID}")
-    class getDepartmentInfo(val branchID: kotlin.Int, val departmentID: kotlin.Int)
+    class getDepartmentInfo(val branchID: Int, val departmentID: Int)
 
 }

@@ -13,25 +13,34 @@ package org.openapitools.server.apis
 
 
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import io.ktor.application.call
 import io.ktor.auth.authentication
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.get
+import io.ktor.request.receiveParameters
 import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.Route
 import org.openapitools.server.Paths
 import org.openapitools.server.infrastructure.ApiPrincipal
 
+import org.openapitools.server.controller.*
+
 @KtorExperimentalLocationsAPI
-fun Route.EmployeeApi() {
-    val gson = Gson()
+fun Route.employeeApi() {
+    /**
+     * A Gson Builder with pretty printing enabled.
+     */
+    val gson: Gson = GsonBuilder().setPrettyPrinting().create()
+
     val empty = mutableMapOf<String, Any?>()
 
-    get<Paths.getMemberInfo> { _: Paths.getMemberInfo ->
+    get<Paths.GetMemberInfo> {
         val principal = call.authentication.principal<ApiPrincipal>()
+        val inputQuery = call.receiveParameters()["employeeID"] ?: ""
 
         if (principal == null) {
             call.respond(HttpStatusCode.Unauthorized)
@@ -45,6 +54,7 @@ fun Route.EmployeeApi() {
               "id" : 1,
               "email" : "email"
             }"""
+            val result = getEmployeeInfo(inputQuery)
 
             when (exampleContentType) {
                 "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))

@@ -19,8 +19,8 @@ import io.ktor.metrics.Metrics
 import io.ktor.routing.Routing
 import io.ktor.util.KtorExperimentalAPI
 import org.jetbrains.exposed.sql.Database
-import org.openapitools.server.apis.EmployeeApi
 import org.openapitools.server.apis.OrganigramApi
+import org.openapitools.server.apis.employeeApi
 import org.openapitools.server.infrastructure.ApiKeyCredential
 import org.openapitools.server.infrastructure.ApiPrincipal
 import org.openapitools.server.infrastructure.apiKeyAuth
@@ -66,7 +66,7 @@ fun Application.main() {
         }
     }
     install(Routing) {
-        EmployeeApi()
+        employeeApi()
         OrganigramApi()
     }
 

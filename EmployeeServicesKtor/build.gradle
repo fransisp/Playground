@@ -44,9 +44,9 @@ compileTestKotlin {
 }
 
 shadowJar {
-    baseName = 'kotlin-server'
-    classifier = null
-    version = null
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
 }
 
 repositories {
@@ -67,6 +67,7 @@ dependencies {
     compile "ch.qos.logback:logback-classic:1.2.3"
     compile 'org.jetbrains.exposed:exposed:0.13.6'
     compile 'com.h2database:h2:1.4.198'
+    testCompile "io.ktor:ktor-server-test-host:$ktor_version"
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.12.2'
     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.4.2'
 
