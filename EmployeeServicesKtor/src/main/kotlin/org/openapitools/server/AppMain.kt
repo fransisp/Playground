@@ -7,23 +7,29 @@ import io.ktor.application.ApplicationStopping
 import io.ktor.application.install
 import io.ktor.application.log
 import io.ktor.auth.Authentication
+import io.ktor.auth.UserHashedTableAuth
+import io.ktor.auth.UserIdPrincipal
+import io.ktor.auth.basic
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
 import io.ktor.config.HoconApplicationConfig
 import io.ktor.features.*
 import io.ktor.gson.GsonConverter
 import io.ktor.http.ContentType
+import io.ktor.http.HttpMethod
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Locations
-import io.ktor.metrics.Metrics
+import io.ktor.metrics.dropwizard.DropwizardMetrics
 import io.ktor.routing.Routing
 import io.ktor.util.KtorExperimentalAPI
+import io.ktor.util.getDigestFunction
 import org.jetbrains.exposed.sql.Database
 import org.openapitools.server.apis.OrganigramApi
 import org.openapitools.server.apis.employeeApi
 import org.openapitools.server.infrastructure.ApiKeyCredential
 import org.openapitools.server.infrastructure.ApiPrincipal
 import org.openapitools.server.infrastructure.apiKeyAuth
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 
@@ -39,7 +45,7 @@ object HTTP {
 fun Application.main() {
     Database.connect("jdbc:h2:mem:test", driver = "org.h2.Driver");
     install(DefaultHeaders)
-    install(Metrics) {
+    install(DropwizardMetrics) {
         val reporter = Slf4jReporter.forRegistry(registry)
                 .outputTo(log)
                 .convertRatesTo(TimeUnit.SECONDS)
@@ -50,21 +56,38 @@ fun Application.main() {
     install(ContentNegotiation) {
         register(ContentType.Application.Json, GsonConverter())
     }
+    install(CORS) {
+        anyHost()
+        allowCredentials = true
+        listOf(HttpMethod("PATCH"), HttpMethod.Put, HttpMethod.Delete).forEach {
+            method(it)
+        }
+    }// Enables Cross-Origin Resource Sharing (CORS)
     install(AutoHeadResponse) // see http://ktor.io/features/autoheadresponse.html
     install(HSTS, ApplicationHstsConfiguration()) // see http://ktor.io/features/hsts.html
     install(Compression, ApplicationCompressionConfiguration()) // see http://ktor.io/features/compression.html
     install(Locations) // see http://ktor.io/features/locations.html
-    install(Authentication) {
+    /*install(Authentication) {
         // "Implement API key auth (api_key) for parameter name 'X-API-KEY'."
-        apiKeyAuth("api_key") {
+        /*apiKeyAuth("api_key") {
             validate { apikeyCredential: ApiKeyCredential ->
                 when {
                     apikeyCredential.value == "keyboardcat" -> ApiPrincipal(apikeyCredential)
                     else -> null
                 }
             }
+        }*/
+        basic {
+            realm = "myrealm"
+            validate { credentials ->
+                if (credentials.name == credentials.password) {
+                    UserIdPrincipal(credentials.name)
+                } else {
+                    null
+                }
+            }
         }
-    }
+    }*/
     install(Routing) {
         employeeApi()
         OrganigramApi()

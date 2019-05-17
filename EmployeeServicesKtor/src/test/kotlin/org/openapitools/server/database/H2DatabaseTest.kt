@@ -56,25 +56,6 @@ class ExposedDAOTest {
             println("Branches: ${BranchDao.all().joinToString { it.name }}")
             println("Departments in ${branchTest.name}: ${DepartmentDAO.all().joinToString { it.name }}")
             println("Employees in ${deptTest.name}: ${deptTest.employees.joinToString { it.name }}")
-            testRequest(HttpMethod.Get, "/employee/${empTest.name}") {println(response.status())}
         }
-    }
-}
-
-private fun testRequest(
-        method: HttpMethod,
-        uri: String,
-        setup: suspend TestApplicationRequest.() -> Unit = {},
-        checks: suspend TestApplicationCall.() -> Unit
-) {
-    httpBinTest {
-        val req = handleRequest(method, uri) { runBlocking { setup() } }
-        checks(req)
-    }
-}
-
-private fun httpBinTest(callback: suspend TestApplicationEngine.() -> Unit): Unit {
-    withTestApplication(Application::main) {
-        runBlocking { callback() }
     }
 }

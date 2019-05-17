@@ -15,19 +15,15 @@ package org.openapitools.server.apis
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import io.ktor.application.call
+import io.ktor.auth.UserIdPrincipal
 import io.ktor.auth.authentication
 import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.get
-import io.ktor.request.receiveParameters
 import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.Route
 import org.openapitools.server.Paths
-import org.openapitools.server.infrastructure.ApiPrincipal
-
-import org.openapitools.server.controller.*
 
 @KtorExperimentalLocationsAPI
 fun Route.employeeApi() {
@@ -37,16 +33,12 @@ fun Route.employeeApi() {
     val gson: Gson = GsonBuilder().setPrettyPrinting().create()
 
     val empty = mutableMapOf<String, Any?>()
-
     get<Paths.GetMemberInfo> {
-        val principal = call.authentication.principal<ApiPrincipal>()
-        val inputQuery = call.receiveParameters()["employeeID"] ?: ""
+        val principal = call.authentication.principal<UserIdPrincipal>()?.name
+        val inputQuery = call.parameters["employeeID"] ?: ""
 
-        if (principal == null) {
-            call.respond(HttpStatusCode.Unauthorized)
-        } else {
-            val exampleContentType = "application/json"
-            val exampleContentString = """{
+        val exampleContentType = "application/json"
+        val exampleContentString = """{
               "empid" : "empid",
               "jobtitle" : "jobtitle",
               "phone" : "phone",
@@ -54,15 +46,12 @@ fun Route.employeeApi() {
               "id" : 1,
               "email" : "email"
             }"""
-            val result = getEmployeeInfo(inputQuery)
+        // val result = getEmployeeInfo(inputQuery)
 
-            when (exampleContentType) {
-                "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
-                "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
-                else -> call.respondText(exampleContentString)
-            }
+        when (exampleContentType) {
+            "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
+            "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
+            else -> call.respondText(exampleContentString)
         }
-
     }
-
 }
