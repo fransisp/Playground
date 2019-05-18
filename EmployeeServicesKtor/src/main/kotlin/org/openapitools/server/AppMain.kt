@@ -67,7 +67,7 @@ fun Application.main() {
     install(HSTS, ApplicationHstsConfiguration()) // see http://ktor.io/features/hsts.html
     install(Compression, ApplicationCompressionConfiguration()) // see http://ktor.io/features/compression.html
     install(Locations) // see http://ktor.io/features/locations.html
-    /*install(Authentication) {
+    install(Authentication) {
         // "Implement API key auth (api_key) for parameter name 'X-API-KEY'."
         /*apiKeyAuth("api_key") {
             validate { apikeyCredential: ApiKeyCredential ->
@@ -87,7 +87,7 @@ fun Application.main() {
                 }
             }
         }
-    }*/
+    }
     install(Routing) {
         employeeApi()
         OrganigramApi()

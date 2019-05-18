@@ -16,8 +16,10 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import io.ktor.application.call
 import io.ktor.auth.UserIdPrincipal
+import io.ktor.auth.authenticate
 import io.ktor.auth.authentication
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.get
 import io.ktor.response.respond
@@ -33,12 +35,16 @@ fun Route.employeeApi() {
     val gson: Gson = GsonBuilder().setPrettyPrinting().create()
 
     val empty = mutableMapOf<String, Any?>()
-    get<Paths.GetMemberInfo> {
-        val principal = call.authentication.principal<UserIdPrincipal>()?.name
-        val inputQuery = call.parameters["employeeID"] ?: ""
+    authenticate {
+        get<Paths.GetMemberInfo> {
+            val principal = call.authentication.principal<UserIdPrincipal>()?.name
+            val inputQuery = call.parameters["employeeID"] ?: ""
 
-        val exampleContentType = "application/json"
-        val exampleContentString = """{
+            if (principal == null) {
+                call.respond(HttpStatusCode.Unauthorized)
+            } else {
+                val exampleContentType = "application/json"
+                val exampleContentString = """{
               "empid" : "empid",
               "jobtitle" : "jobtitle",
               "phone" : "phone",
@@ -46,12 +52,14 @@ fun Route.employeeApi() {
               "id" : 1,
               "email" : "email"
             }"""
-        // val result = getEmployeeInfo(inputQuery)
+                // val result = getEmployeeInfo(inputQuery)
 
-        when (exampleContentType) {
-            "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
-            "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
-            else -> call.respondText(exampleContentString)
+                when (exampleContentType) {
+                    "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
+                    "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
+                    else -> call.respondText(exampleContentString)
+                }
+            }
         }
     }
 }
