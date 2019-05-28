@@ -11,7 +11,6 @@
  */
 package org.openapitools.server.models
 
-
 /**
  *
  * @param id
@@ -22,13 +21,10 @@ package org.openapitools.server.models
  * @param jobtitle
  */
 data class Employee(
-        val id: Long? = null,
-        val name: String? = null,
-        val empid: String? = null,
-        val email: String? = null,
-        val phone: String? = null,
-        val jobtitle: String? = null
-) {
-
-}
-
+        val id: Long,
+        val name: String,
+        val empid: String,
+        val email: String,
+        val phone: String,
+        val jobtitle: String
+)

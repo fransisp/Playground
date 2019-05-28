@@ -11,6 +11,9 @@ import org.openapitools.server.main
 import java.util.*
 import org.junit.Assert.*
 import io.ktor.http.HttpStatusCode
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.transactions.transaction
+import org.openapitools.server.dao.*
 
 @KtorExperimentalAPI
 @KtorExperimentalLocationsAPI
@@ -36,7 +39,13 @@ private fun testRequest(
 private fun httpBinTest(callback: suspend TestApplicationEngine.() -> Unit) {
     withTestApplication(Application::main) {
         runBlocking { callback() }
+        //cleanup schema
+        cleanUpAfter()
     }
+}
+
+private fun cleanUpAfter() = transaction {
+    SchemaUtils.drop(Employees, Departments, Branches)
 }
 
 class RoutingTest {
@@ -44,8 +53,17 @@ class RoutingTest {
     @KtorExperimentalAPI
     @KtorExperimentalLocationsAPI
     fun `simple routing test`() {
-        testRequest(HttpMethod.Get, "/employee/Test") {
+        testRequest(HttpMethod.Get, "/employee/john doe") {
             assertEquals(response.status(), HttpStatusCode.OK)
             println(response.content) }
+    }
+
+    @Test
+    @KtorExperimentalAPI
+    @KtorExperimentalLocationsAPI
+    fun `routing 500 test`() {
+        testRequest(HttpMethod.Get, "/employee/TestNotFound") {
+            assertEquals(response.status(), HttpStatusCode.NotFound)
+            println(response.status()) }
     }
 }

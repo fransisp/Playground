@@ -5,8 +5,19 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.openapitools.server.dao.EmployeeDAO
 import org.openapitools.server.dao.Employees
 import org.openapitools.server.models.Employee
+import org.openapitools.server.service.DatabaseFactory.dbQuery
 
-fun getEmployeeInfo (employeeName:String) : Iterable<EmployeeDAO>
+suspend fun getEmployeeInfo (employeeName:String) : Iterable<Employee> = dbQuery {
+        EmployeeDAO.find { Op.build { Employees.name.like(employeeName) } }.map { toEmployeeModel(it) }
+    }
+
+fun toEmployeeModel (employeeDAO:EmployeeDAO) : Employee
 {
-    return EmployeeDAO.find { Op.build { Employees.name.like(employeeName) } }
+    return Employee(id = employeeDAO.id.value,
+            name = employeeDAO.name,
+            empid =  employeeDAO.empid,
+            email = employeeDAO.email,
+            phone =  employeeDAO.phone,
+            jobtitle = employeeDAO.jobtitle
+            )
 }

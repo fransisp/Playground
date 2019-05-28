@@ -15,6 +15,7 @@ import io.ktor.client.engine.apache.Apache
 import io.ktor.config.HoconApplicationConfig
 import io.ktor.features.*
 import io.ktor.gson.GsonConverter
+import io.ktor.gson.gson
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.locations.KtorExperimentalLocationsAPI
@@ -29,6 +30,7 @@ import org.openapitools.server.apis.employeeApi
 import org.openapitools.server.infrastructure.ApiKeyCredential
 import org.openapitools.server.infrastructure.ApiPrincipal
 import org.openapitools.server.infrastructure.apiKeyAuth
+import org.openapitools.server.service.DatabaseFactory
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -43,7 +45,7 @@ object HTTP {
 @KtorExperimentalAPI
 @KtorExperimentalLocationsAPI
 fun Application.main() {
-    Database.connect("jdbc:h2:mem:test", driver = "org.h2.Driver");
+    DatabaseFactory.init("org.h2.Driver", jdbcURL = "jdbc:h2:mem:test")
     install(DefaultHeaders)
     install(DropwizardMetrics) {
         val reporter = Slf4jReporter.forRegistry(registry)
@@ -55,6 +57,9 @@ fun Application.main() {
     }
     install(ContentNegotiation) {
         register(ContentType.Application.Json, GsonConverter())
+        gson {
+            setPrettyPrinting()
+        }
     }
     install(CORS) {
         anyHost()

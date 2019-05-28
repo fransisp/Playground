@@ -25,7 +25,9 @@ import io.ktor.locations.get
 import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.Route
+import io.netty.handler.codec.http.HttpStatusClass
 import org.openapitools.server.Paths
+import org.openapitools.server.controller.getEmployeeInfo
 
 @KtorExperimentalLocationsAPI
 fun Route.employeeApi() {
@@ -44,20 +46,14 @@ fun Route.employeeApi() {
                 call.respond(HttpStatusCode.Unauthorized)
             } else {
                 val exampleContentType = "application/json"
-                val exampleContentString = """{
-              "empid" : "empid",
-              "jobtitle" : "jobtitle",
-              "phone" : "phone",
-              "name" : "name",
-              "id" : 1,
-              "email" : "email"
-            }"""
-                // val result = getEmployeeInfo(inputQuery)
+                val exampleContent = getEmployeeInfo(inputQuery)
 
-                when (exampleContentType) {
-                    "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
-                    "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
-                    else -> call.respondText(exampleContentString)
+                if (exampleContent.count() == 0) call.response.status(HttpStatusCode.NotFound)
+                else {
+                    when (exampleContentType) {
+                        "application/xml" -> call.respondText(exampleContent.elementAt(0).toString(), ContentType.Text.Xml)
+                        else -> call.respond(exampleContent.elementAt(0).toString())
+                    }
                 }
             }
         }
