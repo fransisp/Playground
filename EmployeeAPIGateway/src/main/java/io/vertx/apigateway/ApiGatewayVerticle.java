@@ -1,7 +1,6 @@
 package io.vertx.apigateway;
 
 import io.vertx.apigateway.component.GatewayServiceDiscovery;
-import io.vertx.config.ConfigRetriever;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
@@ -18,23 +17,23 @@ public class ApiGatewayVerticle extends AbstractVerticle {
 	private static final int DEFAULT_PORT = 8080;
 	private static final String DEFAULT_HOSTNAME = "localhost";
 
-	private GatewayServiceDiscovery apiServiceDiscovery = new GatewayServiceDiscovery(this.vertx, config());
-	
-	// get HTTP host and port from configuration, or use default value
-	String host = config().getString("api.gateway.http.address", DEFAULT_HOSTNAME);
-	int port = config().getInteger("api.gateway.http.port", DEFAULT_PORT);
+	private GatewayServiceDiscovery apiServiceDiscovery;
 
 	@Override
 	public void start(Future<Void> fut) {
 		
-		ConfigRetriever retriever = ConfigRetriever.create(vertx);
+		apiServiceDiscovery = new GatewayServiceDiscovery(this.vertx, config());
+		
+		// get HTTP host and port from configuration, or use default value
+		String host = config().getString("api.gateway.http.address", DEFAULT_HOSTNAME);
+		int port = config().getInteger("api.gateway.http.port", DEFAULT_PORT);
 
 		//publish employee api
 		apiServiceDiscovery.publishHttpEndpoint("getEmployeeInfo", host, port, config());
 
 		vertx
 		.createHttpServer()
-		.requestHandler(r -> r.response().end("<h1>Hello from my first Vert.x application</h1>"))
+		.requestHandler(r -> r.response().end("Test"))
 		.listen(port, host, result -> {
 			if (result.succeeded()) {
 				apiServiceDiscovery.publishApiGateway(host, port);
