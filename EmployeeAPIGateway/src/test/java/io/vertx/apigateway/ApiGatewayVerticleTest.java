@@ -17,13 +17,26 @@ import io.vertx.junit5.VertxTestContext;
 public class ApiGatewayVerticleTest {
 
 	@Test
-	@DisplayName("A first test")
+	@DisplayName("A sanity test")
 	void test_my_application(Vertx vertx, VertxTestContext testContext) {
 		vertx.deployVerticle(new ApiGatewayVerticle(), testContext.succeeding(id -> {
 			WebClient client = WebClient.create(vertx);
 
 			client.get(8080, "localhost", "/").send(testContext.succeeding(response -> testContext.verify(() -> {
 				assertThat(response.body().toString(), is(equalTo("Test")));
+				testContext.completeNow();
+			})));
+		}));
+	}
+	
+	@Test
+	@DisplayName("A routing test")
+	void routingT_test(Vertx vertx, VertxTestContext testContext) {
+		vertx.deployVerticle(new ApiGatewayVerticle(), testContext.succeeding(id -> {
+			WebClient client = WebClient.create(vertx);
+
+			client.get(8080, "localhost", "/getEmployeeInfo").send(testContext.succeeding(response -> testContext.verify(() -> {
+				assertThat(response.body().toString(), is(equalTo("TestRouting")));
 				testContext.completeNow();
 			})));
 		}));

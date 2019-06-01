@@ -1,5 +1,6 @@
 package io.vertx.apigateway;
 
+import io.vertx.apigateway.component.GatewayRouter;
 import io.vertx.apigateway.component.GatewayServiceDiscovery;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -21,27 +22,24 @@ public class ApiGatewayVerticle extends AbstractVerticle {
 
 	@Override
 	public void start(Future<Void> fut) {
-		
-		apiServiceDiscovery = new GatewayServiceDiscovery(this.vertx, config());
-		
 		// get HTTP host and port from configuration, or use default value
-		String host = config().getString("api.gateway.http.address", DEFAULT_HOSTNAME);
-		int port = config().getInteger("api.gateway.http.port", DEFAULT_PORT);
+		String host = config().getString("http.address", DEFAULT_HOSTNAME);
+		int port = config().getInteger("http.port", DEFAULT_PORT);
 
-		//publish employee api
+		apiServiceDiscovery = new GatewayServiceDiscovery(this.vertx, config());
+		//publish employee a
 		apiServiceDiscovery.publishHttpEndpoint("getEmployeeInfo", host, port, config());
 
 		vertx
 		.createHttpServer()
-		.requestHandler(r -> r.response().end("Test"))
+		.requestHandler(new GatewayRouter(this.vertx)::handleRequest)
 		.listen(port, host, result -> {
 			if (result.succeeded()) {
-				apiServiceDiscovery.publishApiGateway(host, port);
 				fut.complete();
 				logger.info("API Gateway is running");
-			} else {
+			} else 
 				fut.fail(result.cause());
 			}
-		});
+		);
 	}
 }

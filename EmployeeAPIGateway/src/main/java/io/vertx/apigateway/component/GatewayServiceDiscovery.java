@@ -20,7 +20,12 @@ public class GatewayServiceDiscovery {
 	private ServiceDiscovery discovery;
 	private Set<Record> records = new ConcurrentHashSet<>();
 	
-	public GatewayServiceDiscovery(Vertx vertx, JsonObject configuration)
+	public GatewayServiceDiscovery()
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	public GatewayServiceDiscovery(final Vertx vertx, JsonObject configuration)
 	{
 		// init service discovery instance
 		discovery = ServiceDiscovery.create(vertx, new ServiceDiscoveryOptions().setBackendConfiguration(configuration));
@@ -40,13 +45,6 @@ public class GatewayServiceDiscovery {
 		return publish(record);
 	}
 
-
-	public Future<Void> publishApiGateway(String host, int port) {
-		Record record = HttpEndpoint.createRecord("api-gateway", true, host, port, "/", null)
-				.setType("api-gateway");
-		return publish(record);
-	}
-
 	/**
 	 * Publish a service with record.
 	 *
@@ -59,7 +57,7 @@ public class GatewayServiceDiscovery {
 		discovery.publish(record, ar -> {
 			if (ar.succeeded()) {
 				records.add(record);
-				logger.info("Service <" + ar.result().getName() + "> published");
+				logger.info("Service <" + ar.result().getName() + "> succesfully published");
 				future.complete();
 			} else {
 				future.fail(ar.cause());
