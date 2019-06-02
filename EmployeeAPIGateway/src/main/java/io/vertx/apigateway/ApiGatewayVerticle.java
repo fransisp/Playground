@@ -9,6 +9,7 @@ import io.vertx.core.logging.LoggerFactory;
 
 /**
  * https://www.sczyh30.com/vertx-blueprint-microservice/
+ * https://www.eclipse.org/community/eclipse_newsletter/2016/october/article4.php
  * @author fransiskus.prayuda
  *
  */
@@ -27,12 +28,13 @@ public class ApiGatewayVerticle extends AbstractVerticle {
 		int port = config().getInteger("http.port", DEFAULT_PORT);
 
 		apiServiceDiscovery = new GatewayServiceDiscovery(this.vertx, config());
-		//publish employee a
-		apiServiceDiscovery.publishHttpEndpoint("getEmployeeInfo", host, port, config());
-
+		//publish employee api
+		apiServiceDiscovery.publishHttpEndpoint("Get Employee Info", "api-specific-host", 8081, "/getEmployeeInfo");
+		apiServiceDiscovery.publishHttpEndpoint("Blank message", "api-specific-host", 8081, "/");
+		
 		vertx
 		.createHttpServer()
-		.requestHandler(new GatewayRouter(this.vertx)::handleRequest)
+		.requestHandler(req -> new GatewayRouter(this.vertx, this.apiServiceDiscovery.getAPIEndpoints(req.absoluteURI())).handleRequest(req))
 		.listen(port, host, result -> {
 			if (result.succeeded()) {
 				fut.complete();
