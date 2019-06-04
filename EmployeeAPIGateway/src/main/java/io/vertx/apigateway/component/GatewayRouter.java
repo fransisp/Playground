@@ -17,20 +17,20 @@ public class GatewayRouter {
 	private Router router;
 	private HttpClient apiClient;
 
-	public GatewayRouter()
-	{
-		throw new UnsupportedOperationException();
-	}
-	
 	public GatewayRouter(final Vertx vertx, final ServiceReference apiClientReference)
 	{
-		logger.info("Create new router instance");
+		//Create new router instance
 		router = Router.router(vertx);
-		apiClient = apiClientReference.getAs(HttpClient.class);
-		apiClientReference.release();
 		createRouting();
+		//assign REST api client where the request will be routed to
+		apiClient = apiClientReference.getAs(HttpClient.class);
+		//apiClientReference.release();
 	}
-	
+
+	/**
+	 * Handler for routing HTTP request to the correct client
+	 * @param req {@code HttpServerRequest} object that need to be routed by the router
+	 */
 	public void handleRequest(HttpServerRequest req)
 	{
 		router.handle(req);
@@ -39,7 +39,7 @@ public class GatewayRouter {
 	private void createRouting() {
 		//push the request body and put it into routingContext
 		router.route().handler(BodyHandler.create());
-		
+
 		logger.info("add route for path : /");
 		router.route("/").handler(routingContext -> {
 			HttpServerResponse response = routingContext.response();
@@ -47,17 +47,18 @@ public class GatewayRouter {
 			response.setStatusCode(200);
 			response.end("Test");
 		});
-		
+
 		logger.info("add route for path : /getEmployeeInfo");
 		router.route("/getEmployeeInfo").handler(this::dispatchRequest);
 	}
 
 	private void dispatchRequest(RoutingContext routingContext)
 	{
-		logger.info("Call will be routed to " + apiClient.toString());
-		routingContext.response()
-		.putHeader("content-type", "application/json")
-		.setStatusCode(200)
-		.end("TestRouting");
+		apiClient.request(routingContext.request().method(), routingContext.request().uri(), 
+				response ->  response.bodyHandler( body -> {
+					HttpServerResponse toRsp = routingContext.response().setStatusCode(response.statusCode());
+					 // send response
+					toRsp.end(body);
+				})).end();
 	}
 }

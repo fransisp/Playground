@@ -19,29 +19,29 @@ public class ApiGatewayVerticle extends AbstractVerticle {
 	private static final int DEFAULT_PORT = 8080;
 	private static final String DEFAULT_HOSTNAME = "localhost";
 
-	private GatewayServiceDiscovery apiServiceDiscovery;
-
 	@Override
 	public void start(Future<Void> fut) {
 		// get HTTP host and port from configuration, or use default value
 		String host = config().getString("http.address", DEFAULT_HOSTNAME);
 		int port = config().getInteger("http.port", DEFAULT_PORT);
 
-		apiServiceDiscovery = new GatewayServiceDiscovery(this.vertx, config());
+		GatewayServiceDiscovery apiServiceDiscovery = new GatewayServiceDiscovery(this.vertx, config());
 		//publish employee api
-		apiServiceDiscovery.publishHttpEndpoint("Get Employee Info", "api-specific-host", 8081, "/getEmployeeInfo");
-		apiServiceDiscovery.publishHttpEndpoint("Blank message", "api-specific-host", 8081, "/");
-		
+		apiServiceDiscovery.publishHttpEndpoint("Get Employee Info", DEFAULT_HOSTNAME, 9000, "/getEmployeeInfo");
+		apiServiceDiscovery.publishHttpEndpoint("Blank message", DEFAULT_HOSTNAME, 9000, "/");
+
 		vertx
 		.createHttpServer()
-		.requestHandler(req -> new GatewayRouter(this.vertx, this.apiServiceDiscovery.getAPIEndpoints(req.absoluteURI())).handleRequest(req))
+		.requestHandler(req -> new GatewayRouter(this.vertx, apiServiceDiscovery.getAPIEndpointsURI(req.absoluteURI())).handleRequest(req))
 		.listen(port, host, result -> {
 			if (result.succeeded()) {
 				fut.complete();
 				logger.info("API Gateway is running");
-			} else 
+			} 
+			else {
 				fut.fail(result.cause());
+				logger.error(fut.cause());
 			}
-		);
+		});
 	}
 }

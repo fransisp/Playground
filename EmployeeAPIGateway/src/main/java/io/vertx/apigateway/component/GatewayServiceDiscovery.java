@@ -2,11 +2,9 @@ package io.vertx.apigateway.component;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
-import io.vertx.core.impl.ConcurrentHashSet;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -21,12 +19,6 @@ public class GatewayServiceDiscovery {
 	private static final Logger logger = LoggerFactory.getLogger(GatewayServiceDiscovery.class);
 
 	private ServiceDiscovery discovery;
-	private Set<Record> records = new ConcurrentHashSet<>();
-
-	public GatewayServiceDiscovery()
-	{
-		throw new UnsupportedOperationException();
-	}
 
 	public GatewayServiceDiscovery(final Vertx vertx, JsonObject configuration)
 	{
@@ -47,42 +39,12 @@ public class GatewayServiceDiscovery {
 				);
 		return publish(record);
 	}
-
-	/**
-	 * Get all REST endpoints from the service discovery
-	 * @param string 
-	 *
-	 * @return async result
-	 */
-	public ServiceReference getAPIEndpoints(String requestURI) {
-		Future<List<Record>> future = Future.future();
-		discovery.getRecords(record -> record.getType().equals(HttpEndpoint.TYPE), future);
-		
-		String apiNameRequest = requestURI.substring(requestURI.lastIndexOf('/'));
-		logger.info("Fetch client for URI " + apiNameRequest);
-		
-		ServiceReference forwardAPI = null;
-		if (future.succeeded())
-		{
-			Optional<Record> client = future.result().stream().filter(record -> record.getMetadata().getString("api.name").equals(apiNameRequest)).findAny();
-			if (client.isPresent())
-				forwardAPI = discovery.getReference(client.get());
-		}
-		return forwardAPI;
-	}
-
-	/**
-	 * Publish a service with record.
-	 *
-	 * @param record service record
-	 * @return async result
-	 */
+	
 	private Future<Void> publish(Record record) {
 		Future<Void> future = Future.future();
 		// publish the service
 		discovery.publish(record, ar -> {
 			if (ar.succeeded()) {
-				records.add(record);
 				logger.info("Service <" + ar.result().getName() + "> succesfully published");
 				future.complete();
 			} else {
@@ -93,4 +55,43 @@ public class GatewayServiceDiscovery {
 		return future;
 	}
 
+	/**
+	 * Get all REST endpoints from the service discovery
+	 * @param string 
+	 *
+	 * @return async result
+	 */
+	public ServiceReference getAPIEndpointsURI(String requestURI) {		
+		String apiNameRequest = requestURI.substring(requestURI.lastIndexOf('/'));
+		logger.info("Fetch HTTP client for URI " + apiNameRequest);
+		
+		return filterHttpEndpointBasedOnRequestURI(apiNameRequest);
+	}
+
+	private ServiceReference filterHttpEndpointBasedOnRequestURI(String apiNameRequest) {
+		Future<List<Record>> futureEndpointList = getAllHttpEndpoint();
+		ServiceReference serviceRefHolder = null;
+		
+		if (futureEndpointList.failed())
+			logger.error(futureEndpointList.cause());
+		else
+		{
+			//filter all endpointlist based on URI on the incoming request and return the reference
+			Optional<Record> client = futureEndpointList.result().stream().filter(record -> record.getMetadata().getString("api.name").equals(apiNameRequest)).findAny();
+			if (client.isPresent())
+			{
+				logger.info("Found record " + client.get().getLocation());
+				serviceRefHolder =  discovery.getReference(client.get());
+			}
+		}
+		return serviceRefHolder;
+	}
+	
+	private Future<List<Record>> getAllHttpEndpoint ()
+	{
+		Future<List<Record>> future = Future.future();
+		//fetch all available HTTP endpoint registered in service discovery
+		discovery.getRecords(record -> record.getType().equals(HttpEndpoint.TYPE), future);
+		return future;
+	}
 }
