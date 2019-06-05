@@ -68,10 +68,11 @@ public class ApiGatewayVerticleTest {
 			})));
 		}
 	
+	@Test
 	@DisplayName("A circuit breaker test")
 	void routing_test_failure(Vertx vertx, VertxTestContext testContext) {
 		client.get(8080, "localhost", "/getDepartmentInfo").send(testContext.succeeding(response -> testContext.verify(() -> {
-			assertThat(response.body().toString(), is(equalTo("TestRouting")));
+			assertThat(response.body().toString(), is(equalTo("Test Error: bad_gateway")));
 			testContext.completeNow();
 			})));
 		}

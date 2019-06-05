@@ -6,7 +6,6 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.servicediscovery.ServiceDiscovery;
 
 /**
  * https://www.sczyh30.com/vertx-blueprint-microservice/
@@ -26,19 +25,11 @@ public class ApiGatewayVerticle extends AbstractVerticle {
 		String host = config().getString("http.address", DEFAULT_HOSTNAME);
 		int port = config().getInteger("http.port", DEFAULT_PORT);
 		
-		//create service discovery instance and assign it to the singleton instance in GatewayServiceDiscoveryUtils
-		ServiceDiscovery.create(this.getVertx(), handler -> {
-			try {
-				GatewayServiceDiscoveryUtils.setDiscoveryReference(handler);
-			} catch (IllegalAccessException e) {
-				logger.error(e);
-				fut.fail(e.getCause());
-			}
-		});
+		 GatewayServiceDiscoveryUtils serviceDiscoveryUtils = GatewayServiceDiscoveryUtils.serviceDiscoveryFactory(this.vertx);
 		
 		//publish employee api
-		GatewayServiceDiscoveryUtils.publishHttpEndpoint("Get Employee Info", DEFAULT_HOSTNAME, 9000, "/getEmployeeInfo");
-		GatewayServiceDiscoveryUtils.publishHttpEndpoint("Test message", DEFAULT_HOSTNAME, 9000, "/");
+		 serviceDiscoveryUtils.publishHttpEndpoint("Get Employee Info", DEFAULT_HOSTNAME, 9000, "/getEmployeeInfo");
+		 serviceDiscoveryUtils.publishHttpEndpoint("Test message", DEFAULT_HOSTNAME, 9000, "/");
 
 		vertx
 		.createHttpServer()
