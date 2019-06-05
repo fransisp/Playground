@@ -15,16 +15,12 @@ public class GatewayRouter {
 
 	private static final Logger logger = LoggerFactory.getLogger(GatewayRouter.class);
 	private Router router;
-	private HttpClient apiClient;
 
-	public GatewayRouter(final Vertx vertx, final ServiceReference apiClientReference)
+	public GatewayRouter(final Vertx vertx)
 	{
 		//Create new router instance
 		router = Router.router(vertx);
 		createRouting();
-		//assign REST api client where the request will be routed to
-		apiClient = apiClientReference.getAs(HttpClient.class);
-		//apiClientReference.release();
 	}
 
 	/**
@@ -37,28 +33,28 @@ public class GatewayRouter {
 	}
 
 	private void createRouting() {
-		//push the request body and put it into routingContext
+		//push the request body and put it into RoutingContext
 		router.route().handler(BodyHandler.create());
 
 		logger.info("add route for path : /");
-		router.route("/").handler(routingContext -> {
-			HttpServerResponse response = routingContext.response();
-			response.putHeader("content-type", "application/json");
-			response.setStatusCode(200);
-			response.end("Test");
-		});
+		router.route("/").handler(this::dispatchRequest);
 
 		logger.info("add route for path : /getEmployeeInfo");
 		router.route("/getEmployeeInfo").handler(this::dispatchRequest);
 	}
 
+	@SuppressWarnings({"deprecation"})
 	private void dispatchRequest(RoutingContext routingContext)
 	{
+		final ServiceReference apiEndpointReference = GatewayServiceDiscoveryUtils.getAPIEndpointsURI(routingContext.request().absoluteURI());
+		//assign HTTP api client where the request will be routed to
+		final HttpClient apiClient = apiEndpointReference.getAs(HttpClient.class);
 		apiClient.request(routingContext.request().method(), routingContext.request().uri(), 
 				response ->  response.bodyHandler( body -> {
 					HttpServerResponse toRsp = routingContext.response().setStatusCode(response.statusCode());
 					 // send response
 					toRsp.end(body);
-				})).end();
+				})) //request method causing depreceation warnings, supressed for now and will be updated to new method with upcoming version of vert.x
+		.end();
 	}
 }

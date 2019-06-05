@@ -1,11 +1,12 @@
 package io.vertx.apigateway;
 
 import io.vertx.apigateway.component.GatewayRouter;
-import io.vertx.apigateway.component.GatewayServiceDiscovery;
+import io.vertx.apigateway.component.GatewayServiceDiscoveryUtils;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.servicediscovery.ServiceDiscovery;
 
 /**
  * https://www.sczyh30.com/vertx-blueprint-microservice/
@@ -24,23 +25,33 @@ public class ApiGatewayVerticle extends AbstractVerticle {
 		// get HTTP host and port from configuration, or use default value
 		String host = config().getString("http.address", DEFAULT_HOSTNAME);
 		int port = config().getInteger("http.port", DEFAULT_PORT);
-
-		GatewayServiceDiscovery apiServiceDiscovery = new GatewayServiceDiscovery(this.vertx, config());
+		
+		//create service discovery instance and assign it to the singleton instance in GatewayServiceDiscoveryUtils
+		ServiceDiscovery.create(this.getVertx(), handler -> {
+			try {
+				GatewayServiceDiscoveryUtils.setDiscoveryReference(handler);
+			} catch (IllegalAccessException e) {
+				logger.error(e);
+				fut.fail(e.getCause());
+			}
+		});
+		
 		//publish employee api
-		apiServiceDiscovery.publishHttpEndpoint("Get Employee Info", DEFAULT_HOSTNAME, 9000, "/getEmployeeInfo");
-		apiServiceDiscovery.publishHttpEndpoint("Blank message", DEFAULT_HOSTNAME, 9000, "/");
+		GatewayServiceDiscoveryUtils.publishHttpEndpoint("Get Employee Info", DEFAULT_HOSTNAME, 9000, "/getEmployeeInfo");
+		GatewayServiceDiscoveryUtils.publishHttpEndpoint("Test message", DEFAULT_HOSTNAME, 9000, "/");
 
 		vertx
 		.createHttpServer()
-		.requestHandler(req -> new GatewayRouter(this.vertx, apiServiceDiscovery.getAPIEndpointsURI(req.absoluteURI())).handleRequest(req))
+		//create router instance and pass the method handleRequest to the requestHandler
+		.requestHandler(new GatewayRouter(this.getVertx())::handleRequest)
 		.listen(port, host, result -> {
 			if (result.succeeded()) {
 				fut.complete();
 				logger.info("API Gateway is running");
 			} 
 			else {
-				fut.fail(result.cause());
 				logger.error(fut.cause());
+				fut.fail(result.cause());
 			}
 		});
 	}
