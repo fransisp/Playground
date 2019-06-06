@@ -52,7 +52,7 @@ public class ApiGatewayVerticleTest {
 
 	@Test
 	@DisplayName("A routing test")
-	@Description("")
+	@Description("Happy flow test - pass the request from 8080 to the routed listener server on port 9000 and get the response back")
 	void routing_test(VertxTestContext testContext) {
 		client.get(8080, "localhost", "/getEmployeeInfo").send(testContext.succeeding(response -> testContext.verify(() -> {
 			assertThat(response.body().toString(), is(equalTo("TestRouting GetEmployeeInfo")));
@@ -62,8 +62,9 @@ public class ApiGatewayVerticleTest {
 	
 	@Test
 	@DisplayName("A circuit breaker test")
-	@Description("")
-	void routing_test_failure(Vertx vertx, VertxTestContext testContext) {
+	@Description("Resiliency test - the /getDepartmentInfo does not exist but it should fail gracefully "
+			+ "since the exception will be handled by the circuit breaker")
+	void when_routing_test_failure_then_error_handled_by_circuit_breaker(Vertx vertx, VertxTestContext testContext) {
 		client.get(8080, "localhost", "/getDepartmentInfo").send(testContext.succeeding(response -> testContext.verify(() -> {
 			assertThat(response.body().toString(), is(equalTo("Test Error: bad_gateway")));
 			testContext.completeNow();
