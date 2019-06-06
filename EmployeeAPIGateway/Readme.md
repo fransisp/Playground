@@ -1,7 +1,7 @@
 # Employee API Gateway
 
 #### 'A Welcome mat'
-In this project I tried to leverage Vert.x framework to create a simple REST API gateway. I’ve choose for this framework because of the nature of a gateway where it has to handle lot of requests from the frontend to REST API backend without a lot of logic built-in. 
+In this project I tried to leverage Vert.x framework to create a simple REST API gateway. Iâ€™ve choose for this framework because of the nature of a gateway where it has to handle lot of requests from the frontend to REST API backend without a lot of logic built-in. 
 
 #### What does it do?
 The asynchronous non-blocking development model and the built-in event bus in Vert.x fit for this very purpose, beside that Vert.x also has some other interesting features / components that really help on implementing a fully functional gateway with lot of features. The gateway in the sample project will have the following basic functions:
@@ -10,14 +10,14 @@ The asynchronous non-blocking development model and the built-in event bus in Ve
 2. **Service discovery**
 <br />Component that hold records of all available backend REST endpoint
 3. **Circuit breaker**
-<br />Component that helps make the gateway more resilient. The component took care if the endpoint is unreachable / down so that the exception can be handled gracefully. Furthermore this component also responsible to stop the unreachable endpoint getting bombarded with requests and only let some requests through after each period of time to check if it’s up and running again (half-open state).
+<br />Component that helps make the gateway more resilient. The component took care if the endpoint is unreachable / down so that the exception can be handled gracefully. Furthermore this component also responsible to stop the unreachable endpoint getting bombarded with requests and only let some requests through after each period of time to check if itâ€™s up and running again (half-open state).
 
 #### Some sanity checks
-Since the application only contains of very few business logic, I’ve only accompanied them with 2 sets of integration tests to check if all the above 3 components are working properly. The 2 tests are described as follows:
+Since the application only contains of very few business logic, Iâ€™ve only accompanied them with 2 sets of integration tests to check if all the above 3 components are working properly. The 2 tests are described as follows:
 1. Happy flow tests
-Create a REST API request to localhost:8080 where the gateway is configured to run and the router will route this request (after lookup in the service discovery) to the mock backend that runs on port 9000 (configured on the tests) which should return a response back.
+<br />Create a REST API request to localhost:8080 where the gateway is configured to run and the router will route this request (after lookup in the service discovery) to the mock backend that runs on port 9000 (configured on the tests) which should return a response back.
 2. Circuit breaker tests
-Create a REST API request to localhost:8080 where the gateway is configured to run but since there is no endpoint found for this specific API, the circuit breaker should take over and return an bad gateway error back without crashing the whole gateway application.
+<br />Create a REST API request to localhost:8080 where the gateway is configured to run but since there is no endpoint found for this specific API, the circuit breaker should take over and return an bad gateway error back without crashing the whole gateway application.
 
 #### Going above and beyond
 Further improvements for the future:
