@@ -10,7 +10,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import io.vertx.apigateway.component.ApiGatewayVerticle;
 import io.vertx.core.Vertx;
+import io.vertx.core.cli.annotations.Description;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
@@ -32,8 +34,6 @@ public class ApiGatewayVerticleTest {
 		.requestHandler(req -> {
 			if (req.uri().equalsIgnoreCase("/getemployeeinfo"))
 				req.response().setStatusCode(200).end("TestRouting GetEmployeeInfo");
-			else
-				req.response().setStatusCode(200).end("Test");
 		  })
 		.listen(9000, "localhost", result -> {
 			if (result.failed()) {
@@ -51,16 +51,8 @@ public class ApiGatewayVerticleTest {
 	}
 
 	@Test
-	@DisplayName("A sanity test")
-	void test_my_application(VertxTestContext testContext) {
-		client.get(8080, "localhost", "/").send(testContext.succeeding(response -> testContext.verify(() -> {
-			assertThat(response.body().toString(), is(equalTo("Test")));
-			testContext.completeNow();
-		})));
-	}
-
-	@Test
 	@DisplayName("A routing test")
+	@Description("")
 	void routing_test(VertxTestContext testContext) {
 		client.get(8080, "localhost", "/getEmployeeInfo").send(testContext.succeeding(response -> testContext.verify(() -> {
 			assertThat(response.body().toString(), is(equalTo("TestRouting GetEmployeeInfo")));
@@ -70,6 +62,7 @@ public class ApiGatewayVerticleTest {
 	
 	@Test
 	@DisplayName("A circuit breaker test")
+	@Description("")
 	void routing_test_failure(Vertx vertx, VertxTestContext testContext) {
 		client.get(8080, "localhost", "/getDepartmentInfo").send(testContext.succeeding(response -> testContext.verify(() -> {
 			assertThat(response.body().toString(), is(equalTo("Test Error: bad_gateway")));

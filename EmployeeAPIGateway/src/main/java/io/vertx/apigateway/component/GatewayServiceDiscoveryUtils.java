@@ -13,9 +13,13 @@ import io.vertx.servicediscovery.ServiceDiscovery;
 import io.vertx.servicediscovery.ServiceReference;
 import io.vertx.servicediscovery.types.HttpEndpoint;
 
+/**
+ * Utility class to help manage the {@code ServiceDiscovery} object functionality
+ * @author fransiskus.prayuda
+ */
 public class GatewayServiceDiscoveryUtils {
 	
-	private ServiceDiscovery serviceDiscovery;
+	private final ServiceDiscovery serviceDiscovery;
 	private static final Logger logger = LoggerFactory.getLogger(GatewayServiceDiscoveryUtils.class);
 	
 	private GatewayServiceDiscoveryUtils (final Vertx gatewayVertx)
@@ -24,7 +28,7 @@ public class GatewayServiceDiscoveryUtils {
 	}
 	
 	/**
-	 * Factory to initialize the instance in the Utility class with the given gateway vertx object
+	 * Factory to initialize the {@code ServiceDiscovery} instance in the Utility class with the given gateway vertx object
 	 * @param gatewayVertx specify Vertx object where the Service Discovery is referenced
 	 * @return an initialized utility object with referenced to service discovery object of the specified Vertx
 	 */
@@ -35,19 +39,20 @@ public class GatewayServiceDiscoveryUtils {
 
 	/**
 	 * Publish HTTP endpoint to the service record
-	 * @param name
-	 * @param host
-	 * @param port
-	 * @return
+	 * @param name of the endpoint
+	 * @param host name
+	 * @param port where the endpoint is listening to
+	 * @param endpointName recorded in the service record
+	 * @return {@code Future} object to let caller method know if the operation is succeded or not
 	 */
-	public Future<Void> publishHttpEndpoint(String name, String host, int port, String endpointName) {
+	public Future<Void> publishHttpEndpoint(final String name, final String host, final int port, final String endpointName) {
 		Record record = HttpEndpoint.createRecord(name, host, port, "/",
 				new JsonObject().put("api.name", endpointName)
 				);
 		return publish(record);
 	}
 	
-	private Future<Void> publish(Record record) {
+	private Future<Void> publish(final Record record) {
 		Future<Void> future = Future.future();
 		// publish the service
 		serviceDiscovery.publish(record, ar -> {
@@ -67,16 +72,15 @@ public class GatewayServiceDiscoveryUtils {
 	 * @param String request URI
 	 * @return 
 	 */
-	public ServiceReference getAPIEndpointHTTPClient(String requestURI) {		
+	public ServiceReference getAPIEndpointHTTPClient(final String requestURI) {		
 		String apiNameRequest = requestURI.substring(requestURI.lastIndexOf('/'));
-		logger.info("Fetch HTTP client for URI " + apiNameRequest);
+		logger.debug("Fetch HTTP client for URI " + apiNameRequest);
 		
 		return filterHttpEndpointBasedOnRequestURI(apiNameRequest);
 	}
 
 	private ServiceReference filterHttpEndpointBasedOnRequestURI(String apiNameRequest) {
 		Future<List<Record>> futureEndpointList = getAllHttpEndpoint();
-		ServiceReference serviceRefHolder = null;
 		
 		if (futureEndpointList.failed())
 			logger.error(futureEndpointList.cause());
@@ -85,10 +89,9 @@ public class GatewayServiceDiscoveryUtils {
 			//filter all endpointlist based on URI on the incoming request and return the reference
 			Optional<Record> client = futureEndpointList.result().stream().filter(record -> record.getMetadata().getString("api.name").equals(apiNameRequest)).findAny();
 			if (client.isPresent())
-
-				serviceRefHolder =  serviceDiscovery.getReference(client.get());
+				return serviceDiscovery.getReference(client.get());
 		}
-		return serviceRefHolder;
+		return null;
 	}
 	
 	private Future<List<Record>> getAllHttpEndpoint ()
@@ -103,7 +106,7 @@ public class GatewayServiceDiscoveryUtils {
 	 * Release given api end point reference after use
 	 * @param apiEndpointReference resource that will be released after service call
 	 */
-	public void releaseAPIEndpointsURI(ServiceReference apiEndpointReference) {	
+	public void releaseAPIEndpointsURI(final ServiceReference apiEndpointReference) {	
 		serviceDiscovery.release(apiEndpointReference);
 	}
 }
