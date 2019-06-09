@@ -1,21 +1,31 @@
 package org.openapitools.server.database
 
-import io.ktor.application.Application
-import io.ktor.http.HttpMethod
-import io.ktor.server.testing.*
-import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.openapitools.server.dao.*
 import org.openapitools.server.dao.Employees.empid
-import org.openapitools.server.main
+import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.junit.jupiter.Container
+import org.testcontainers.junit.jupiter.Testcontainers
 
+
+@Container
+val container = PostgreSQLContainer<Nothing>("postgres:12-alpine")
+        .apply {
+            withUsername("sa")
+            withPassword("sa")
+            withExposedPorts(5432)
+        }
+
+@Testcontainers
 class ExposedDAOTest {
     @Test
     fun `can do simple h2 database ops`() {
-        Database.connect("jdbc:h2:mem:test;IGNORECASE=TRUE", driver = "org.h2.Driver")
+        container.start();
+        Database.connect(url = container.jdbcUrl, driver = "org.postgresql.Driver",
+                 user = "sa", password = "sa")
 
         transaction {
             addLogger(StdOutSqlLogger)
@@ -57,5 +67,6 @@ class ExposedDAOTest {
             println("Departments in ${branchTest.name}: ${DepartmentDAO.all().joinToString { it.name }}")
             println("Employees in ${deptTest.name}: ${deptTest.employees.joinToString { it.name }}")
         }
+        container.stop()
     }
 }
