@@ -11,8 +11,8 @@ import org.openapitools.server.dao.*
 
 object DatabaseFactory {
 
-    fun init(driverName:String, jdbcURL:String) {
-        Database.connect(hikariConfiguration(driverName, jdbcURL))
+    fun init(driverName:String, jdbcURL:String, username:String, password:String) {
+        Database.connect(hikariConfiguration(driverName, jdbcURL, username, password))
         transaction {
             SchemaUtils.create(Employees, Departments, Branches)
             val branchTest = BranchDao.new {
@@ -39,10 +39,12 @@ object DatabaseFactory {
         }
     }
 
-    private fun hikariConfiguration(driverClassName: String, jdbcURL: String): HikariDataSource {
+    private fun hikariConfiguration(driverClassName: String, jdbcURL: String, userName : String, passW : String): HikariDataSource {
         val config = HikariConfig()
         config.driverClassName = driverClassName
         config.jdbcUrl = jdbcURL
+        config.username = userName
+        config.password = passW
         config.maximumPoolSize = 3
         config.isAutoCommit = false
         config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"

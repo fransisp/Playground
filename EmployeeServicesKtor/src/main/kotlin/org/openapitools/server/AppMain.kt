@@ -45,7 +45,7 @@ object HTTP {
 @KtorExperimentalAPI
 @KtorExperimentalLocationsAPI
 fun Application.main() {
-    DatabaseFactory.init("org.h2.Driver", jdbcURL = "jdbc:h2:mem:test")
+    DatabaseFactory.init("org.h2.Driver", jdbcURL = "jdbc:h2:mem:test", username = "sa", password = "sa")
     install(DefaultHeaders)
     install(DropwizardMetrics) {
         val reporter = Slf4jReporter.forRegistry(registry)

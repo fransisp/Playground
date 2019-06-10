@@ -66,13 +66,12 @@ dependencies {
     compile "io.ktor:ktor-client-apache:$ktor_version"
     compile "ch.qos.logback:logback-classic:1.2.3"
     compile 'org.jetbrains.exposed:exposed:0.14.1'
-    compile 'com.h2database:h2:1.4.198'
     compile 'com.zaxxer:HikariCP:3.3.1'
     testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.11.3'
     testCompile group: 'org.testcontainers', name: 'junit-jupiter', version: '1.11.3'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
     testCompile "io.ktor:ktor-server-test-host:$ktor_version"
+    implementation "io.ktor:ktor-client-auth:$ktor_version"
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.12.2'
     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.4.2'
-    implementation "io.ktor:ktor-client-auth:$ktor_version"
 }
