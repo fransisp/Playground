@@ -20,12 +20,8 @@ package org.openapitools.server.models
  * @param employees
  */
 data class Department(
-        val id: Long? = null,
-        val name: String? = null,
-        val lead: String? = null,
-        val description: String? = null,
-        val employees: Array<Employee>? = null
-) {
-
-}
-
+        override val id: Long,
+        override val name: String,
+        override val lead: String,
+        override val description: String
+) : Organigram

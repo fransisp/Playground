@@ -19,6 +19,7 @@ object DatabaseFactory {
                 name = "Aperture"
                 lead = "GLaDOS"
                 description = "is anybody safe?"
+                location = "unknown"
             }
 
             val deptTest = DepartmentDAO.new {

@@ -14,6 +14,8 @@ package org.openapitools.server.apis
 
 import com.google.gson.Gson
 import io.ktor.application.call
+import io.ktor.auth.UserIdPrincipal
+import io.ktor.auth.authenticate
 import io.ktor.auth.authentication
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -23,115 +25,54 @@ import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.Route
 import org.openapitools.server.Paths
-import org.openapitools.server.infrastructure.ApiPrincipal
+import org.openapitools.server.controller.getBranchInfo
+import org.openapitools.server.controller.getDepartmentInfo
 
 @KtorExperimentalLocationsAPI
 fun Route.OrganigramApi() {
     val gson = Gson()
-    val empty = mutableMapOf<String, Any?>()
 
-    get<Paths.getBranchInfo> { _: Paths.getBranchInfo ->
-        val principal = call.authentication.principal<ApiPrincipal>()
+    authenticate {
+        get<Paths.getBranchInfo> {
+            val principal = call.authentication.principal<UserIdPrincipal>()?.name
+            val inputBranchID = call.parameters["branchID"]?.toLong() ?: -1L
 
-        if (principal == null) {
-            call.respond(HttpStatusCode.Unauthorized)
-        } else {
-            val exampleContentType = "application/json"
-            val exampleContentString = """{
-              "name" : "name",
-              "description" : "description",
-              "location" : "location",
-              "id" : 0,
-              "departments" : [ {
-                "name" : "name",
-                "description" : "description",
-                "id" : 6,
-                "employees" : [ {
-                  "empid" : "empid",
-                  "jobtitle" : "jobtitle",
-                  "phone" : "phone",
-                  "name" : "name",
-                  "id" : 1,
-                  "email" : "email"
-                }, {
-                  "empid" : "empid",
-                  "jobtitle" : "jobtitle",
-                  "phone" : "phone",
-                  "name" : "name",
-                  "id" : 1,
-                  "email" : "email"
-                } ],
-                "lead" : "lead"
-              }, {
-                "name" : "name",
-                "description" : "description",
-                "id" : 6,
-                "employees" : [ {
-                  "empid" : "empid",
-                  "jobtitle" : "jobtitle",
-                  "phone" : "phone",
-                  "name" : "name",
-                  "id" : 1,
-                  "email" : "email"
-                }, {
-                  "empid" : "empid",
-                  "jobtitle" : "jobtitle",
-                  "phone" : "phone",
-                  "name" : "name",
-                  "id" : 1,
-                  "email" : "email"
-                } ],
-                "lead" : "lead"
-              } ],
-              "lead" : "lead"
-            }"""
+            if (principal == null) {
+                call.respond(HttpStatusCode.Unauthorized)
+            } else {
+                val exampleContentType = "application/json"
+                val exampleContent = getBranchInfo(branchID = inputBranchID)
 
-            when (exampleContentType) {
-                "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
-                "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
-                else -> call.respondText(exampleContentString)
+                if (exampleContent == null) call.response.status(HttpStatusCode.NotFound)
+                else {
+                    when (exampleContentType) {
+                        "application/xml" -> call.respondText(gson.toJson(exampleContent), ContentType.Text.Xml)
+                        else -> call.respond(gson.toJson(exampleContent))
+                    }
+                }
             }
         }
 
-    }
 
+        get<Paths.getDepartmentInfo> {
+            val principal = call.authentication.principal<UserIdPrincipal>()?.name
+            val inputDeptID = call.parameters["departmentID"]?.toLong() ?: -1L
+            val inputBranchID = call.parameters["branchID"]?.toLong() ?: -1L
 
-    get<Paths.getDepartmentInfo> { _: Paths.getDepartmentInfo ->
-        val principal = call.authentication.principal<ApiPrincipal>()
+            if (principal == null) {
+                call.respond(HttpStatusCode.Unauthorized)
+            } else {
+                val exampleContentType = "application/json"
+                val exampleContent = getDepartmentInfo(branchID = inputBranchID, departmentID = inputDeptID)
 
-        if (principal == null) {
-            call.respond(HttpStatusCode.Unauthorized)
-        } else {
-            val exampleContentType = "application/json"
-            val exampleContentString = """{
-              "name" : "name",
-              "description" : "description",
-              "id" : 6,
-              "employees" : [ {
-                "empid" : "empid",
-                "jobtitle" : "jobtitle",
-                "phone" : "phone",
-                "name" : "name",
-                "id" : 1,
-                "email" : "email"
-              }, {
-                "empid" : "empid",
-                "jobtitle" : "jobtitle",
-                "phone" : "phone",
-                "name" : "name",
-                "id" : 1,
-                "email" : "email"
-              } ],
-              "lead" : "lead"
-            }"""
-
-            when (exampleContentType) {
-                "application/json" -> call.respond(gson.fromJson(exampleContentString, empty::class.java))
-                "application/xml" -> call.respondText(exampleContentString, ContentType.Text.Xml)
-                else -> call.respondText(exampleContentString)
+                if (exampleContent == null) call.response.status(HttpStatusCode.NotFound)
+                else {
+                    when (exampleContentType) {
+                        "application/xml" -> call.respondText(gson.toJson(exampleContent), ContentType.Text.Xml)
+                        else -> call.respond(gson.toJson(exampleContent))
+                    }
+                }
             }
         }
-
     }
-
 }

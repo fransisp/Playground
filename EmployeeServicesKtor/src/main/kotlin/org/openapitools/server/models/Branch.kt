@@ -21,13 +21,9 @@ package org.openapitools.server.models
  * @param departments
  */
 data class Branch(
-        val id: Long? = null,
-        val name: String? = null,
-        val lead: String? = null,
-        val description: String? = null,
-        val location: String? = null,
-        val departments: Array<Department>? = null
-) {
-
-}
-
+        override val id: Long,
+        override val name: String,
+        override val lead: String,
+        override val description: String,
+        val location: String
+) : Organigram

@@ -36,7 +36,6 @@ fun Route.employeeApi() {
      */
     val gson: Gson = GsonBuilder().setPrettyPrinting().create()
 
-    val empty = mutableMapOf<String, Any?>()
     authenticate {
         get<Paths.GetMemberInfo> {
             val principal = call.authentication.principal<UserIdPrincipal>()?.name
@@ -51,7 +50,7 @@ fun Route.employeeApi() {
                 if (exampleContent.count() == 0) call.response.status(HttpStatusCode.NotFound)
                 else {
                     when (exampleContentType) {
-                        "application/xml" -> call.respondText(exampleContent.elementAt(0).toString(), ContentType.Text.Xml)
+                        "application/xml" -> call.respondText(gson.toJson(exampleContent.elementAt(0)), ContentType.Text.Xml)
                         else -> call.respond(exampleContent.elementAt(0).toString())
                     }
                 }

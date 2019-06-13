@@ -1,0 +1,178 @@
+openapi: 3.0.0
+info:
+  description: These are the services for the organisation site. These will be called by
+    the frontend to provide the data
+  version: 1.0.0
+  title: Organisation Services
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: fr.prayuda@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+tags:
+  - name: Organigram
+    description: services for the Branch and Department
+  - name: Employee
+    description: Services for the Employee
+paths:
+  "/organisation/{branchID}":
+    get:
+      tags:
+        - Organigram
+      summary: get the details of the given branch
+      description: get branch info of given ID
+      operationId: getBranchInfo
+      parameters:
+        - name: branchID
+          in: path
+          description: Branch ID that will be use for filter
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Branch"
+        "400":
+          description: Invalid request parameter value
+      security:
+        - api_key: []
+  "/organisation/{branchID}/department/{departmentID}":
+    get:
+      tags:
+        - Organigram
+      summary: get the details of the given department
+      description: get department info of given ID
+      operationId: getDepartmentInfo
+      parameters:
+        - name: branchID
+          in: path
+          description: Branch ID that will be use for filter
+          required: true
+          schema:
+            type: integer
+        - name: departmentID
+          in: path
+          description: Department ID that will be use for filter
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Department"
+        "400":
+          description: Invalid request parameter value
+      security:
+        - api_key: []
+  "/employee/{employeeID}":
+    get:
+      tags:
+        - Employee
+      summary: get the details of the given employee
+      description: get employee info of given ID
+      operationId: getMemberInfo
+      parameters:
+        - name: employeeID
+          in: path
+          description: Employee ID that will be use for filter
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Employee"
+        "400":
+          description: Invalid request parameter value
+      security:
+        - api_key: []
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: https://petstore.swagger.io/v2
+  - url: http://petstore.swagger.io/v2
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+  schemas:
+    Branch:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        lead:
+          type: string
+        description:
+          type: string
+        location:
+          type: string
+        departments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Department"
+      xml:
+        name: Branch
+    Department:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        lead:
+          type: string
+        description:
+          type: string
+        employees:
+          type: array
+          items:
+            $ref: "#/components/schemas/Employee"
+      xml:
+        name: Department
+    Employee:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        empid:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        jobtitle:
+          type: string
+      xml:
+        name: Employee
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
