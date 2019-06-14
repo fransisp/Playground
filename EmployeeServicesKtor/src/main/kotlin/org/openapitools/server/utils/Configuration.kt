@@ -1,4 +1,4 @@
-package org.openapitools.server
+package org.openapitools.server.utils
 
 // Use this file to hold package-level internal functions that return receiver object passed to the `install` method.
 

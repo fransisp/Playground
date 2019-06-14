@@ -1,4 +1,4 @@
-package org.openapitools.server.service
+package org.openapitools.server.utils
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -6,6 +6,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.openapitools.server.dao.*
 
@@ -29,13 +31,13 @@ object DatabaseFactory {
                 branch = branchTest
             }
 
-            EmployeeDAO.new {
-                name = "john doe"
-                empid = "john.doe"
-                email = "johndoe@acme.io"
-                jobtitle = "developer"
-                phone = "0123456789"
-                department = deptTest
+            Employees.insert {
+                it[name] = "john doe"
+                it[empid] = "john.doe"
+                it[email] = "johndoe@acme.io"
+                it[jobtitle] = "developer"
+                it[phone] = "0123456789"
+                it[department] = deptTest.id
             }
         }
     }

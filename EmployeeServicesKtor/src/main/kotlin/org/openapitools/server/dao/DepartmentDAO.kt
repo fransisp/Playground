@@ -15,6 +15,6 @@ class DepartmentDAO(id: EntityID<Long>) : LongEntity(id) {
     var name by Departments.name
     var lead by Departments.lead
     var description by Departments.description
-    val employees by EmployeeDAO referrersOn Employees.department
+    //val employees by EmployeeDAO referrersOn Employees.department
     var branch by BranchDao referencedOn Departments.branch
 }

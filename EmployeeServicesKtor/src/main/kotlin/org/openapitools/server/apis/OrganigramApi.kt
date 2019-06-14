@@ -24,7 +24,7 @@ import io.ktor.locations.get
 import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.Route
-import org.openapitools.server.Paths
+import org.openapitools.server.infrastructure.Paths
 import org.openapitools.server.controller.getBranchInfo
 import org.openapitools.server.controller.getDepartmentInfo
 

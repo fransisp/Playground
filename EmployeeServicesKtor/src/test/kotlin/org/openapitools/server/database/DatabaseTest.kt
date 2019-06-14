@@ -2,17 +2,17 @@ package org.openapitools.server.database
 
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.openapitools.server.dao.*
 import org.openapitools.server.dao.Departments.branch
+import org.openapitools.server.dao.Departments.id
 import org.openapitools.server.dao.Employees.department
 import org.openapitools.server.dao.Employees.empid
-import org.openapitools.server.models.Branch
-import org.openapitools.server.service.DatabaseFactory
+import org.openapitools.server.dao.Employees.name
+import org.openapitools.server.utils.DatabaseFactory
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -54,9 +54,9 @@ class ExposedDAOTest {
 
                 assert(DepartmentDAO.findById(1)?.name.equals("Research"))
 
-                EmployeeDAO.find(Op.build { empid.eq("john doe") })
+                Employees.select { empid.eq("john doe") }
                         .forEach {
-                            assertThat(it.id.value == 1L)
+                            assertThat(it[id].value == 1L)
                         }
 
                 BranchDao.all().forEach {
@@ -66,8 +66,7 @@ class ExposedDAOTest {
                             .forEach {
                                 println("Department: ${it.name}")
                                 println("With Employees in ${it.name}:")
-                                EmployeeDAO.find(Op.build { department.eq(it.id) })
-                                        .forEach { println("Employee: ${it.name}") }
+                                Employees.select{ department eq it.id }.forEach{ println("Employee: ${it[name]}")}
                             }
                 }
             }

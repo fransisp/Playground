@@ -9,7 +9,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package org.openapitools.server
+package org.openapitools.server.infrastructure
 
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Location

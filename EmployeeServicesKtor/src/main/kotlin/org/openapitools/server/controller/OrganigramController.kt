@@ -5,7 +5,7 @@ import org.openapitools.server.dao.DepartmentDAO
 import org.openapitools.server.models.Branch
 import org.openapitools.server.models.Department
 import org.openapitools.server.models.Organigram
-import org.openapitools.server.service.DatabaseFactory
+import org.openapitools.server.utils.DatabaseFactory
 
 suspend fun getDepartmentInfo(branchID: Long, departmentID: Long): Organigram? = DatabaseFactory.dbQuery {
     BranchDao.findById(branchID)?.departments?.first { it.id.value == departmentID }.let { deptDAOToOrganigramModel(it) }

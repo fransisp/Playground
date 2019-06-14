@@ -7,7 +7,6 @@ import io.ktor.application.ApplicationStopping
 import io.ktor.application.install
 import io.ktor.application.log
 import io.ktor.auth.Authentication
-import io.ktor.auth.UserHashedTableAuth
 import io.ktor.auth.UserIdPrincipal
 import io.ktor.auth.basic
 import io.ktor.client.HttpClient
@@ -23,15 +22,11 @@ import io.ktor.locations.Locations
 import io.ktor.metrics.dropwizard.DropwizardMetrics
 import io.ktor.routing.Routing
 import io.ktor.util.KtorExperimentalAPI
-import io.ktor.util.getDigestFunction
-import org.jetbrains.exposed.sql.Database
 import org.openapitools.server.apis.OrganigramApi
 import org.openapitools.server.apis.employeeApi
-import org.openapitools.server.infrastructure.ApiKeyCredential
-import org.openapitools.server.infrastructure.ApiPrincipal
-import org.openapitools.server.infrastructure.apiKeyAuth
-import org.openapitools.server.service.DatabaseFactory
-import java.util.*
+import org.openapitools.server.utils.ApplicationCompressionConfiguration
+import org.openapitools.server.utils.ApplicationHstsConfiguration
+import org.openapitools.server.utils.DatabaseFactory
 import java.util.concurrent.TimeUnit
 
 
