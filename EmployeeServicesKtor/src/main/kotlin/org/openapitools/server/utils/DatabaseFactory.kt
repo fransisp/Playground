@@ -17,18 +17,18 @@ object DatabaseFactory {
         Database.connect(hikariConfiguration(driverName, jdbcURL, username, password))
         transaction {
             SchemaUtils.create(Employees, Departments, Branches)
-            val branchTest = BranchDao.new {
-                name = "Aperture"
-                lead = "GLaDOS"
-                description = "is anybody safe?"
-                location = "unknown"
+            val branchTest = Branches.insertAndGetId {
+                it[name] = "Aperture"
+                it[lead] = "GLaDOS"
+                it[description] = "is anybody safe?"
+                it[location] = "unknown"
             }
 
-            val deptTest = DepartmentDAO.new {
-                name = "Research"
-                lead = "mr. nobody"
-                description = "cool things happens here"
-                branch = branchTest
+            val deptTest = Departments.insertAndGetId {
+                it[name] = "Research"
+                it[lead] = "mr. nobody"
+                it[description] = "cool things happens here"
+                it[branch] = branchTest
             }
 
             Employees.insert {
@@ -37,7 +37,7 @@ object DatabaseFactory {
                 it[email] = "johndoe@acme.io"
                 it[jobtitle] = "developer"
                 it[phone] = "0123456789"
-                it[department] = deptTest.id
+                it[department] = deptTest
             }
         }
     }

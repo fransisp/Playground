@@ -9,7 +9,7 @@ object Departments : LongIdTable() {
     val branch = reference("department", Branches)
 }
 
-class DepartmentDAO(id: EntityID<Long>) : LongEntity(id) {
+/*class DepartmentDAO(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<DepartmentDAO>(Departments)
 
     var name by Departments.name
@@ -17,4 +17,4 @@ class DepartmentDAO(id: EntityID<Long>) : LongEntity(id) {
     var description by Departments.description
     //val employees by EmployeeDAO referrersOn Employees.department
     var branch by BranchDao referencedOn Departments.branch
-}
+}*/

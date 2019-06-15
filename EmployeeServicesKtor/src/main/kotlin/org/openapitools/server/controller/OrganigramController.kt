@@ -1,39 +1,49 @@
 package org.openapitools.server.controller
 
-import org.openapitools.server.dao.BranchDao
-import org.openapitools.server.dao.DepartmentDAO
+import org.jetbrains.exposed.sql.Query
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.select
+import org.openapitools.server.dao.Branches
+import org.openapitools.server.dao.Departments
 import org.openapitools.server.models.Branch
 import org.openapitools.server.models.Department
 import org.openapitools.server.models.Organigram
 import org.openapitools.server.utils.DatabaseFactory
 
-suspend fun getDepartmentInfo(branchID: Long, departmentID: Long): Organigram? = DatabaseFactory.dbQuery {
-    BranchDao.findById(branchID)?.departments?.first { it.id.value == departmentID }.let { deptDAOToOrganigramModel(it) }
+suspend fun getDepartmentInfo(branchID: Long, departmentID: Long): Iterable<Organigram> = DatabaseFactory.dbQuery {
+    Departments.select { (Departments.id eq departmentID) and (Departments.branch eq branchID) }.let { deptDAOToOrganigramModel(it) }
 }
 
-fun deptDAOToOrganigramModel(deptDAO: DepartmentDAO?): Organigram? {
-    return when (deptDAO == null) {
-        true -> null
-        false -> Department(id = deptDAO.id.value,
-                name = deptDAO.name,
-                lead = deptDAO.lead,
-                description = deptDAO.description
-        )
+fun deptDAOToOrganigramModel(deptQuery: Query): Iterable<Organigram> {
+
+    return when (deptQuery.fetchSize == 0) {
+        true -> emptyList()
+        false -> {
+            deptQuery.flatMap {
+                listOf(Department(id = it[Departments.id].value,
+                        name = it[Departments.name],
+                        lead = it[Departments.lead],
+                        description = it[Departments.description]))
+            }
+        }
     }
 }
 
-suspend fun getBranchInfo(branchID: Long): Organigram? = DatabaseFactory.dbQuery {
-    BranchDao.findById(branchID).let { branchDAOToOrganigramModel(it) }
+suspend fun getBranchInfo(branchID: Long): Iterable<Organigram> = DatabaseFactory.dbQuery {
+    Branches.select { Branches.id eq branchID }.let { branchDAOToOrganigramModel(it) }
 }
 
-fun branchDAOToOrganigramModel(branchDao: BranchDao?): Organigram? {
-    return when (branchDao == null) {
-        true -> null
-        false -> Branch(id = branchDao.id.value,
-                name = branchDao.name,
-                lead = branchDao.lead,
-                description = branchDao.description,
-                location = branchDao.location
-        )
+fun branchDAOToOrganigramModel(branchQuery: Query): Iterable<Organigram> {
+    return when (branchQuery.fetchSize == 0) {
+        true -> emptyList()
+        false -> {
+            branchQuery.flatMap {
+                listOf(Branch(id = it[Branches.id].value,
+                        name = it[Branches.name],
+                        lead = it[Branches.lead],
+                        description = it[Branches.description],
+                        location = it[Branches.location]))
+            }
+        }
     }
 }

@@ -3,6 +3,7 @@ package org.openapitools.server.database
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.*
 import org.assertj.core.api.Assertions.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -50,23 +51,24 @@ class ExposedDAOTest {
         runBlocking {
             DatabaseFactory.dbQuery {
 
-                assert(BranchDao.findById(1)?.name.equals("Aperture"))
-
-                assert(DepartmentDAO.findById(1)?.name.equals("Research"))
+                //assert(BranchDao.findById(1)?.name.equals("Aperture"))
+                Branches.select {Branches.id eq 1L}.forEach{assert(it[Branches.name] == "Aperture")}
+                //assert(DepartmentDAO.findById(1)?.name.equals("Research"))
+                Departments.select {Departments.id eq 1L}.forEach{assert(it[Departments.name] == "Research")}
 
                 Employees.select { empid.eq("john doe") }
                         .forEach {
                             assertThat(it[id].value == 1L)
                         }
 
-                BranchDao.all().forEach {
-                    println("Branches: ${it.name}")
-                    println("Departments in ${it.name}:")
-                    DepartmentDAO.find(Op.build { branch.eq(it.id) })
+                Branches.selectAll().forEach {
+                    println("Branches: ${it[Branches.name]}")
+                    println("Departments in ${it[Branches.name]}:")
+                    Departments.select {branch eq it[Branches.id]}
                             .forEach {
-                                println("Department: ${it.name}")
-                                println("With Employees in ${it.name}:")
-                                Employees.select{ department eq it.id }.forEach{ println("Employee: ${it[name]}")}
+                                println("Department: ${it[Departments.name]}")
+                                println("With Employees in ${it[Departments.name]}:")
+                                Employees.select{ department eq it[id] }.forEach{ println("Employee: ${it[Employees.name]}")}
                             }
                 }
             }

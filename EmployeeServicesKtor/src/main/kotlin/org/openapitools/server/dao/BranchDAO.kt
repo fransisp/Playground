@@ -9,7 +9,7 @@ object Branches : LongIdTable() {
     val location = varchar("location", 50)
 }
 
-class BranchDao(id: EntityID<Long>) : LongEntity(id) {
+/*class BranchDao(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<BranchDao>(Branches)
 
     var name by Branches.name
@@ -17,4 +17,4 @@ class BranchDao(id: EntityID<Long>) : LongEntity(id) {
     var description by Branches.description
     var location by Branches.location
     val departments by DepartmentDAO referrersOn Departments.branch
-}
+}*/

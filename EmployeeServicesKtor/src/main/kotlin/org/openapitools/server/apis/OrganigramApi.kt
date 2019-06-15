@@ -43,7 +43,7 @@ fun Route.OrganigramApi() {
                 val exampleContentType = "application/json"
                 val exampleContent = getBranchInfo(branchID = inputBranchID)
 
-                if (exampleContent == null) call.response.status(HttpStatusCode.NotFound)
+                if (exampleContent.toList().isNullOrEmpty()) call.response.status(HttpStatusCode.NotFound)
                 else {
                     when (exampleContentType) {
                         "application/xml" -> call.respondText(gson.toJson(exampleContent), ContentType.Text.Xml)
@@ -65,7 +65,7 @@ fun Route.OrganigramApi() {
                 val exampleContentType = "application/json"
                 val exampleContent = getDepartmentInfo(branchID = inputBranchID, departmentID = inputDeptID)
 
-                if (exampleContent == null) call.response.status(HttpStatusCode.NotFound)
+                if (exampleContent.toList().isNullOrEmpty()) call.response.status(HttpStatusCode.NotFound)
                 else {
                     when (exampleContentType) {
                         "application/xml" -> call.respondText(gson.toJson(exampleContent), ContentType.Text.Xml)
