@@ -18,6 +18,7 @@ data class ApiPrincipal(val apiKeyCredential: ApiKeyCredential?) : Principal
 
 
 /**
+ * NOTE: no key authentication implemented yet in the current version, API still secured with basic auth
  * Represents a Api Key authentication provider
  * @param name is the name of the provider, or `null` for a default provider
  */

@@ -11,9 +11,9 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.openapitools.server.dao.Branches
-import org.openapitools.server.dao.Departments
-import org.openapitools.server.dao.Employees
+import org.openapitools.server.model.Branches
+import org.openapitools.server.model.Departments
+import org.openapitools.server.model.Employees
 import org.openapitools.server.main
 import java.util.*
 

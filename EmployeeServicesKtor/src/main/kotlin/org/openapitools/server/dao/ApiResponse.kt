@@ -9,22 +9,20 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package org.openapitools.server.models
+package org.openapitools.server.dao
+
 
 /**
  *
- * @param id
- * @param name
- * @param empid
- * @param email
- * @param phone
- * @param jobtitle
+ * @param code
+ * @param type
+ * @param message
  */
-data class Employee(
-        val id: Long,
-        val name: String,
-        val empid: String,
-        val email: String,
-        val phone: String,
-        val jobtitle: String
-)
+data class ApiResponse(
+        val code: kotlin.Int? = null,
+        val type: kotlin.String? = null,
+        val message: kotlin.String? = null
+) {
+
+}
+

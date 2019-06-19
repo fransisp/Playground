@@ -11,11 +11,10 @@
  */
 package org.openapitools.server.apis
 
-
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import io.ktor.application.call
 import io.ktor.auth.UserIdPrincipal
-import io.ktor.auth.authenticate
 import io.ktor.auth.authentication
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -25,52 +24,61 @@ import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.Route
 import org.openapitools.server.infrastructure.Paths
-import org.openapitools.server.controller.getBranchInfo
-import org.openapitools.server.controller.getDepartmentInfo
+import org.openapitools.server.model.getBranchInfo
+import org.openapitools.server.model.getDepartmentInfo
 
+/**
+ * Function to handle all request send to getBranchInfo and getDepartmentInfo HTTP endpoint
+ */
 @KtorExperimentalLocationsAPI
 fun Route.OrganigramApi() {
-    val gson = Gson()
+    /**
+     * A Gson Builder with pretty printing enabled.
+     */
+    val gson: Gson = GsonBuilder().setPrettyPrinting().create()
 
-    authenticate {
-        get<Paths.getBranchInfo> {
-            val principal = call.authentication.principal<UserIdPrincipal>()?.name
-            val inputBranchID = call.parameters["branchID"]?.toLong() ?: -1L
+    //routing to get branch info
+    get<Paths.getBranchInfo> {
+        val principal = call.authentication.principal<UserIdPrincipal>()?.name
+        val inputBranchID = call.parameters["branchID"]?.toLong() ?: -1L
 
-            if (principal == null) {
-                call.respond(HttpStatusCode.Unauthorized)
-            } else {
-                val exampleContentType = "application/json"
-                val exampleContent = getBranchInfo(branchID = inputBranchID)
+        if (principal == null) {
+            //no authentication
+            call.respond(HttpStatusCode.Unauthorized)
+        } else {
+            val exampleContentType = "application/json"
+            val exampleContent = getBranchInfo(branchID = inputBranchID)
 
-                if (exampleContent.toList().isNullOrEmpty()) call.response.status(HttpStatusCode.NotFound)
-                else {
-                    when (exampleContentType) {
-                        "application/xml" -> call.respondText(gson.toJson(exampleContent), ContentType.Text.Xml)
-                        else -> call.respond(gson.toJson(exampleContent))
-                    }
+            //check if any data can be found with the given criteria
+            if (exampleContent.toList().isNullOrEmpty()) call.response.status(HttpStatusCode.NotFound)
+            else {
+                when (exampleContentType) {
+                    "application/xml" -> call.respondText(gson.toJson(exampleContent), ContentType.Text.Xml)
+                    else -> call.respond(gson.toJson(exampleContent))
                 }
             }
         }
+    }
 
+    //routing to get department info
+    get<Paths.getDepartmentInfo> {
+        val principal = call.authentication.principal<UserIdPrincipal>()?.name
+        val inputDeptID = call.parameters["departmentID"]?.toLong() ?: -1L
+        val inputBranchID = call.parameters["branchID"]?.toLong() ?: -1L
 
-        get<Paths.getDepartmentInfo> {
-            val principal = call.authentication.principal<UserIdPrincipal>()?.name
-            val inputDeptID = call.parameters["departmentID"]?.toLong() ?: -1L
-            val inputBranchID = call.parameters["branchID"]?.toLong() ?: -1L
+        if (principal == null) {
+            //no authentication
+            call.respond(HttpStatusCode.Unauthorized)
+        } else {
+            val exampleContentType = "application/json"
+            val exampleContent = getDepartmentInfo(branchID = inputBranchID, departmentID = inputDeptID)
 
-            if (principal == null) {
-                call.respond(HttpStatusCode.Unauthorized)
-            } else {
-                val exampleContentType = "application/json"
-                val exampleContent = getDepartmentInfo(branchID = inputBranchID, departmentID = inputDeptID)
-
-                if (exampleContent.toList().isNullOrEmpty()) call.response.status(HttpStatusCode.NotFound)
-                else {
-                    when (exampleContentType) {
-                        "application/xml" -> call.respondText(gson.toJson(exampleContent), ContentType.Text.Xml)
-                        else -> call.respond(gson.toJson(exampleContent))
-                    }
+            //check if any data can be found with the given criteria
+            if (exampleContent.toList().isNullOrEmpty()) call.response.status(HttpStatusCode.NotFound)
+            else {
+                when (exampleContentType) {
+                    "application/xml" -> call.respondText(gson.toJson(exampleContent), ContentType.Text.Xml)
+                    else -> call.respond(gson.toJson(exampleContent))
                 }
             }
         }

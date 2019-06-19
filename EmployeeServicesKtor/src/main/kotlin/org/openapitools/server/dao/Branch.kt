@@ -9,19 +9,20 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package org.openapitools.server.models
+package org.openapitools.server.dao
 
 /**
- *
- * @param id
- * @param name
- * @param lead
- * @param description
- * @param employees
+ * DAO for Branch
+ * @param id id of the organisation branch
+ * @param name branch name
+ * @param lead lead of the organisation branch
+ * @param description short explanation of the organisation
+ * @param location city where the organisation is located
  */
-data class Department(
+data class Branch(
         override val id: Long,
         override val name: String,
         override val lead: String,
-        override val description: String
+        override val description: String,
+        val location: String
 ) : Organigram

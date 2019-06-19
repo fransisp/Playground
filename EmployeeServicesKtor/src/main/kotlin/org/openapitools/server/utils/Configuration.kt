@@ -48,7 +48,7 @@ internal fun ApplicationCompressionConfiguration(): Compression.Configuration.()
     }
 }
 
-// Defines authentication mechanisms used throughout the application.
+// Defines authentication mechanisms used throughout the application. - NOT YET USED
 @KtorExperimentalAPI
 val ApplicationAuthProviders: Map<String, OAuthServerSettings> = listOf<OAuthServerSettings>(
 //        OAuthServerSettings.OAuth2ServerSettings(

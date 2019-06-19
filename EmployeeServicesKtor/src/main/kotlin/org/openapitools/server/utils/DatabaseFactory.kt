@@ -9,13 +9,17 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.openapitools.server.dao.*
+import org.openapitools.server.model.*
 
+/**
+ * Factory object to initialized databes connection
+ */
 object DatabaseFactory {
 
     fun init(driverName:String, jdbcURL:String, username:String, password:String) {
         Database.connect(hikariConfiguration(driverName, jdbcURL, username, password))
         transaction {
+            //create database schema and fill it in with dummy data
             SchemaUtils.create(Employees, Departments, Branches)
             val branchTest = Branches.insertAndGetId {
                 it[name] = "Aperture"
@@ -42,6 +46,7 @@ object DatabaseFactory {
         }
     }
 
+    //configure hikari connection pool to manage all connections to the database
     private fun hikariConfiguration(driverClassName: String, jdbcURL: String, userName : String, passW : String): HikariDataSource {
         val config = HikariConfig()
         config.driverClassName = driverClassName
@@ -55,6 +60,7 @@ object DatabaseFactory {
         return HikariDataSource(config)
     }
 
+    //functions that receive lambda object consisting method need to be executed in the databse
     suspend fun <T> dbQuery(block: () -> T): T =
             withContext(Dispatchers.IO) {
                 transaction { block() }

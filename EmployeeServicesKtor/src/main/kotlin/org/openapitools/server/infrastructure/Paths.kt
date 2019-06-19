@@ -14,7 +14,9 @@ package org.openapitools.server.infrastructure
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Location
 
-
+/**
+ * Object listing all the available HTTP endpoints exposed by the webservice
+ */
 object Paths {
     /**
      * get the details of the given employee

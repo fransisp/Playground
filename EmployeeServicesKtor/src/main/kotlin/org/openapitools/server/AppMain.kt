@@ -8,6 +8,7 @@ import io.ktor.application.install
 import io.ktor.application.log
 import io.ktor.auth.Authentication
 import io.ktor.auth.UserIdPrincipal
+import io.ktor.auth.authenticate
 import io.ktor.auth.basic
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
@@ -29,7 +30,9 @@ import org.openapitools.server.utils.ApplicationHstsConfiguration
 import org.openapitools.server.utils.DatabaseFactory
 import java.util.concurrent.TimeUnit
 
-
+/**
+ * Starting entry of the whole application, including main configuration of all the components
+ */
 @KtorExperimentalAPI
 internal val settings = HoconApplicationConfig(ConfigFactory.defaultApplication(HTTP::class.java.classLoader))
 
@@ -40,6 +43,7 @@ object HTTP {
 @KtorExperimentalAPI
 @KtorExperimentalLocationsAPI
 fun Application.main() {
+    //initialize database connection
     DatabaseFactory.init("org.h2.Driver", jdbcURL = settings.property("database.jdbcUrl").getString(),
             username = settings.property("database.dbUser").getString(), password = settings.property("database.dbPassword").getString())
     install(DefaultHeaders)
@@ -78,6 +82,7 @@ fun Application.main() {
                 }
             }
         }*/
+        //only use basic auth for now
         basic {
             realm = "myrealm"
             validate { credentials ->
@@ -90,10 +95,12 @@ fun Application.main() {
         }
     }
     install(Routing) {
-        employeeApi()
-        OrganigramApi()
+        //only serve authenticated request
+        authenticate {
+            employeeApi()
+            OrganigramApi()
+        }
     }
-
 
     environment.monitor.subscribe(ApplicationStopping)
     {

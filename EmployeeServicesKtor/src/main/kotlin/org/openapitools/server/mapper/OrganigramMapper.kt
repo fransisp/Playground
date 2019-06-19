@@ -1,20 +1,19 @@
-package org.openapitools.server.controller
+package org.openapitools.server.mapper
 
 import org.jetbrains.exposed.sql.Query
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.select
-import org.openapitools.server.dao.Branches
-import org.openapitools.server.dao.Departments
-import org.openapitools.server.models.Branch
-import org.openapitools.server.models.Department
-import org.openapitools.server.models.Organigram
+import org.openapitools.server.model.Branches
+import org.openapitools.server.model.Departments
+import org.openapitools.server.dao.Branch
+import org.openapitools.server.dao.Department
+import org.openapitools.server.dao.Organigram
 import org.openapitools.server.utils.DatabaseFactory
 
-suspend fun getDepartmentInfo(branchID: Long, departmentID: Long): Iterable<Organigram> = DatabaseFactory.dbQuery {
-    Departments.select { (Departments.id eq departmentID) and (Departments.branch eq branchID) }.let { deptDAOToOrganigramModel(it) }
-}
-
-fun deptDAOToOrganigramModel(deptQuery: Query): Iterable<Organigram> {
+/**
+ * Function to map Department Row Data Gateway object to the Department DAO model
+ */
+fun deptRowGatewayToOrganigramDAO(deptQuery: Query): Iterable<Organigram> {
 
     return when (deptQuery.fetchSize == 0) {
         true -> emptyList()
@@ -29,11 +28,10 @@ fun deptDAOToOrganigramModel(deptQuery: Query): Iterable<Organigram> {
     }
 }
 
-suspend fun getBranchInfo(branchID: Long): Iterable<Organigram> = DatabaseFactory.dbQuery {
-    Branches.select { Branches.id eq branchID }.let { branchDAOToOrganigramModel(it) }
-}
-
-fun branchDAOToOrganigramModel(branchQuery: Query): Iterable<Organigram> {
+/**
+ * Function to map Branch Row Data Gateway object to the Branch DAO model
+ */
+fun branchRowGatewayToOrganigramDAO(branchQuery: Query): Iterable<Organigram> {
     return when (branchQuery.fetchSize == 0) {
         true -> emptyList()
         false -> {
