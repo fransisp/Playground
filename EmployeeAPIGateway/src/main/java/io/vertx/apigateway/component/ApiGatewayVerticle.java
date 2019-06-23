@@ -12,7 +12,7 @@ import io.vertx.core.logging.LoggerFactory;
 public class ApiGatewayVerticle extends AbstractVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(ApiGatewayVerticle.class);
-	private static final int DEFAULT_PORT = 8080;
+	private static final int DEFAULT_PORT = 11000;
 	private static final String DEFAULT_HOSTNAME = "localhost";
 
 	@Override
@@ -24,7 +24,7 @@ public class ApiGatewayVerticle extends AbstractVerticle {
 		//fetch service discovery utility instance for this Vertx
 		GatewayServiceDiscoveryUtils serviceDiscoveryUtils = GatewayServiceDiscoveryUtils.serviceDiscoveryFactory(this.vertx);
 		//register all the available apis via the utility instance
-		serviceDiscoveryUtils.publishHttpEndpoint("Get Employee Info", DEFAULT_HOSTNAME, 9000, "/getEmployeeInfo");
+		serviceDiscoveryUtils.publishHttpEndpoint("Get Employee Info", DEFAULT_HOSTNAME, 9000, "/employee");
 
 		vertx
 		.createHttpServer()

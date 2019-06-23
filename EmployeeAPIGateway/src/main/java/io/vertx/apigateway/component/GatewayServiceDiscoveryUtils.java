@@ -2,6 +2,8 @@ package io.vertx.apigateway.component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
@@ -21,6 +23,8 @@ public class GatewayServiceDiscoveryUtils {
 	
 	private final ServiceDiscovery serviceDiscovery;
 	private static final Logger logger = LoggerFactory.getLogger(GatewayServiceDiscoveryUtils.class);
+	
+	private Pattern portPattern = Pattern.compile("\\:[0-9]{1,5}");
 	
 	private GatewayServiceDiscoveryUtils (final Vertx gatewayVertx)
 	{
@@ -72,8 +76,13 @@ public class GatewayServiceDiscoveryUtils {
 	 * @param String request URI
 	 * @return 
 	 */
-	public ServiceReference getAPIEndpointHTTPClient(final String requestURI) {		
-		String apiNameRequest = requestURI.substring(requestURI.lastIndexOf('/'));
+	public ServiceReference getAPIEndpointHTTPClient(final String requestURI) {
+		Matcher matcher = portPattern.matcher(requestURI);
+		int startLocApiName = 0;
+		if (matcher.find())
+			startLocApiName = matcher.end();
+		int endLocApiName = requestURI.lastIndexOf('/');
+		String apiNameRequest = requestURI.substring(startLocApiName, endLocApiName);
 		logger.debug("Fetch HTTP client for URI " + apiNameRequest);
 		
 		return filterHttpEndpointBasedOnRequestURI(apiNameRequest);

@@ -32,7 +32,7 @@ public class ApiGatewayVerticleTest {
 		vertx
 		.createHttpServer()
 		.requestHandler(req -> {
-			if (req.uri().equalsIgnoreCase("/getemployeeinfo"))
+			if (req.uri().contains("/employee"))
 				req.response().setStatusCode(200).end("TestRouting GetEmployeeInfo");
 		  })
 		.listen(9000, "localhost", result -> {
@@ -54,7 +54,7 @@ public class ApiGatewayVerticleTest {
 	@DisplayName("A routing test")
 	@Description("Happy flow test - pass the request from 8080 to the routed listener server on port 9000 and get the response back")
 	void routing_test(VertxTestContext testContext) {
-		client.get(8080, "localhost", "/getEmployeeInfo").send(testContext.succeeding(response -> testContext.verify(() -> {
+		client.get(11000, "localhost", "/employee/john%20doe").send(testContext.succeeding(response -> testContext.verify(() -> {
 			assertThat(response.body().toString(), is(equalTo("TestRouting GetEmployeeInfo")));
 			testContext.completeNow();
 			})));
@@ -65,7 +65,7 @@ public class ApiGatewayVerticleTest {
 	@Description("Resiliency test - the /getDepartmentInfo does not exist but it should fail gracefully "
 			+ "since the exception will be handled by the circuit breaker")
 	void when_routing_test_failure_then_error_handled_by_circuit_breaker(Vertx vertx, VertxTestContext testContext) {
-		client.get(8080, "localhost", "/getDepartmentInfo").send(testContext.succeeding(response -> testContext.verify(() -> {
+		client.get(11000, "localhost", "/getDepartmentInfo").send(testContext.succeeding(response -> testContext.verify(() -> {
 			assertThat(response.body().toString(), is(equalTo("Test Error: bad_gateway")));
 			testContext.completeNow();
 			})));

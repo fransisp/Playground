@@ -63,7 +63,7 @@ public class GatewayRouter {
 		final ServiceReference apiEndpointReference = serviceDiscoveryUtils.getAPIEndpointHTTPClient(routingContext.request().absoluteURI());
 		if (Objects.isNull(apiEndpointReference)) 
 		{
-			operation.fail("No HTTP endpoint can be found with URI");
+			operation.fail("No HTTP endpoint can be found with URI" + routingContext.request().absoluteURI());
 			logger.error(operation.cause());
 		}
 		else {
