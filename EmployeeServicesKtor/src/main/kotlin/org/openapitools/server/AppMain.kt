@@ -44,7 +44,7 @@ object HTTP {
 @KtorExperimentalLocationsAPI
 fun Application.main() {
     //initialize database connection
-    DatabaseFactory.init("org.h2.Driver", jdbcURL = settings.property("database.jdbcUrl").getString(),
+    DatabaseFactory.init(settings.property("database.jdbcDriver").getString(), jdbcURL = settings.property("database.jdbcUrl").getString(),
             username = settings.property("database.dbUser").getString(), password = settings.property("database.dbPassword").getString())
     install(DefaultHeaders)
     install(DropwizardMetrics) {
