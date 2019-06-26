@@ -3,7 +3,7 @@ package io.dropwizard.employeeapiauth;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-
+import static org.junit.Assert.assertNotNull;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 
 import javax.ws.rs.client.Entity;
@@ -37,6 +37,7 @@ public class EmployeeAuthAppTest {
 	private static Form validForm;
 	private static Form invalidForm;
 	private static WebTarget endpointTarget;
+	private static WebTarget endpointLoggedInTarget;
 	
 	@BeforeAll
 	public static void setUp()
@@ -50,35 +51,36 @@ public class EmployeeAuthAppTest {
 				.param(PASSWORD_PARAM, "password");
 		
 		endpointTarget = new JerseyClientBuilder(RULE.getEnvironment()).build("test auth").target(String.format("http://localhost:%d/login", RULE.getLocalPort()));
+		endpointLoggedInTarget = new JerseyClientBuilder(RULE.getEnvironment()).build("test token auth").target(String.format("http://localhost:%d/loggedIn", RULE.getLocalPort()));
 	}
 
 	@Test
 	public void whenGivenValidUserAndPass_thenReturnStatus200() {
-		
 		Response response = endpointTarget.request().post(Entity.form(EmployeeAuthAppTest.validForm));
-		
 		log.info("Result from call " + response.getHeaderString(AUTHORIZATION));
-
 		assertThat(response.getStatus(), is(equalTo(HttpStatus.OK_200)));
 	}
 	
 	@Test
 	public void whenGivenInvalidUserAndPass_thenReturnStatus401() {
-		
 		Response response = endpointTarget.request().post(Entity.form(EmployeeAuthAppTest.invalidForm));
-		
 		log.info("Result from call " + response);
-
 		assertThat(response.getStatus(), is(equalTo(HttpStatus.UNAUTHORIZED_401)));
 	}
 	
 	@Test
-	public void whenGivenToken_thenReturnStatus200WithUserName() {
-		
+	public void whenGivenNoToken_thenReturnStatus401OnSecuredURL() {
+		Response responseWithOutToken = endpointLoggedInTarget.request().post(Entity.form(new Form()));
+		assertThat(responseWithOutToken.getStatus(), is(equalTo(HttpStatus.UNAUTHORIZED_401)));
+	}
+	
+	@Test
+	public void whenGivenToken_thenReturnStatus200OnSecuredURL() {
 		Response response = endpointTarget.request().post(Entity.form(EmployeeAuthAppTest.validForm));
+		String registeredToken = response.getHeaderString(AUTHORIZATION);
+		assertNotNull(registeredToken);
 		
-		log.info("Result from call " + response.getHeaderString(AUTHORIZATION));
-
-		assertThat(response.getStatus(), is(equalTo(HttpStatus.OK_200)));
+		Response responseWithToken = endpointLoggedInTarget.request().header(AUTHORIZATION, registeredToken).post(Entity.form(new Form()));
+		assertThat(responseWithToken.getStatus(), is(equalTo(HttpStatus.OK_200)));
 	}
 }

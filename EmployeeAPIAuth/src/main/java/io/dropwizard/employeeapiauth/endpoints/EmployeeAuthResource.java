@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.dropwizard.employeeapiauth.filter.JWTRequestNeeded;
 import io.dropwizard.employeeapiauth.model.User;
 import io.dropwizard.employeeapiauth.utils.JwtHelper;
 import io.dropwizard.jackson.Jackson;
@@ -49,6 +50,14 @@ public class EmployeeAuthResource {
 			log.error("Log in process error", e);
 			return Response.status(UNAUTHORIZED).build();
 		}
+	}
+	
+	@POST
+	@Path(value = "/loggedIn")
+	@Consumes(APPLICATION_FORM_URLENCODED)
+	@JWTRequestNeeded
+	public Response tokenAuthenticatedUser() {
+		return Response.ok("Authorized by token").build();
 	}
 
 	private User authenticate(String login, String password) {
