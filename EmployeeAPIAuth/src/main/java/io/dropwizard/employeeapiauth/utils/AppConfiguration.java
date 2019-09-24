@@ -4,6 +4,10 @@ import io.dropwizard.Configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.constraints.NotEmpty;
 
+/**
+ * @author fransiskus.prayuda
+ * Class that holds various application configuration
+ */
 public class AppConfiguration extends Configuration {
     @NotEmpty
     private String template;

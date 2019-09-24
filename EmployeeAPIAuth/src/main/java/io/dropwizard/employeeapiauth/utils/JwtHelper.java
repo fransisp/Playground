@@ -41,9 +41,10 @@ public class JwtHelper {
         return jwTokenHelper;
     }
 
-    public String issueToken(String login) {
+    public String issueToken(String login, String issuerURI) {
         return JWT.create()
                 .withSubject(login)
+                .withIssuer(issuerURI)
                 .withIssuedAt(new Date())
                 .withExpiresAt(Date.from(Instant.now().plus(EXPIRATION_LIMIT, ChronoUnit.MINUTES)))
                 .sign(Algorithm.HMAC512(secret.getEncoded()));

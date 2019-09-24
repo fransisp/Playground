@@ -15,6 +15,11 @@ import javax.ws.rs.ext.Provider;
 import io.dropwizard.employeeapiauth.utils.JwtHelper;
 import lombok.extern.log4j.Log4j;
 
+/**
+ * @author fransiskus.prayuda
+ * Request filter to validate if a token can be found inside the header
+ */
+
 @Log4j
 @Provider
 @JWTRequestNeeded
