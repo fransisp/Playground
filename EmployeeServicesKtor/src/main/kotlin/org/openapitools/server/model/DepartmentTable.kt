@@ -1,6 +1,6 @@
 package org.openapitools.server.model
 
-import org.jetbrains.exposed.dao.*
+import org.jetbrains.exposed.dao.LongIdTable
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.select
 import org.openapitools.server.dao.Organigram

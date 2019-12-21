@@ -1,14 +1,17 @@
 package org.openapitools.server.database
 
 import kotlinx.coroutines.runBlocking
-import org.jetbrains.exposed.sql.*
-import org.assertj.core.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
-import org.openapitools.server.model.*
+import org.openapitools.server.model.Branches
+import org.openapitools.server.model.Departments
 import org.openapitools.server.model.Departments.branch
 import org.openapitools.server.model.Departments.id
+import org.openapitools.server.model.Employees
 import org.openapitools.server.model.Employees.department
 import org.openapitools.server.model.Employees.empid
 import org.openapitools.server.utils.DatabaseFactory
@@ -24,7 +27,6 @@ class ExposedDAOTest {
                 .apply {
                     withUsername("sa")
                     withPassword("sa")
-                    withExposedPorts(5432)
                 }
 
         @BeforeAll

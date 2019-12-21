@@ -10,11 +10,17 @@ import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.openapitools.server.main
 import org.openapitools.server.model.Branches
 import org.openapitools.server.model.Departments
 import org.openapitools.server.model.Employees
-import org.openapitools.server.main
+import org.openapitools.server.updateJdbcURL
+import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.junit.jupiter.Container
+import org.testcontainers.junit.jupiter.Testcontainers
 import java.util.*
 
 @KtorExperimentalAPI
@@ -51,7 +57,30 @@ private fun cleanUpAfter() =
             SchemaUtils.drop(Employees, Departments, Branches)
         }
 
+@Testcontainers
 class RoutingTest {
+    companion object {
+        @Container
+        val container = PostgreSQLContainer<Nothing>("postgres:12-alpine")
+                .apply {
+                    withUsername("postgres")
+                    withPassword("postgres")
+                }
+
+        @BeforeAll
+        @JvmStatic
+        fun startDBContainer() {
+            container.start()
+            updateJdbcURL(container.jdbcUrl)
+        }
+
+        @AfterAll
+        @JvmStatic
+        fun stopDBContainer() {
+            container.stop()
+        }
+    }
+
     @Test
     @KtorExperimentalAPI
     @KtorExperimentalLocationsAPI

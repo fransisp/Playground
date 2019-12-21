@@ -9,7 +9,9 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.openapitools.server.model.*
+import org.openapitools.server.model.Branches
+import org.openapitools.server.model.Departments
+import org.openapitools.server.model.Employees
 
 /**
  * Factory object to initialized databes connection

@@ -1,10 +1,8 @@
 package org.openapitools.server.mapper
 
 import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.select
-import org.openapitools.server.model.Employees
 import org.openapitools.server.dao.Employee
-import org.openapitools.server.utils.DatabaseFactory.dbQuery
+import org.openapitools.server.model.Employees
 
 /**
  * Function to map Employee Row Data Gateway object to the Employee DAO model

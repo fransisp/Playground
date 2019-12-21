@@ -40,12 +40,22 @@ object HTTP {
     val client = HttpClient(Apache)
 }
 
+
+private val jdbcDriver = settings.property("database.jdbcDriver").getString()
+private var jdbcUrl = settings.property("database.jdbcUrl").getString()
+private val username = settings.property("database.dbUser").getString()
+private val password = settings.property("database.dbPassword").getString()
+
+internal fun updateJdbcURL (newURL : String){
+    jdbcUrl = newURL
+}
+
+
 @KtorExperimentalAPI
 @KtorExperimentalLocationsAPI
 fun Application.main() {
     //initialize database connection
-    DatabaseFactory.init(settings.property("database.jdbcDriver").getString(), jdbcURL = settings.property("database.jdbcUrl").getString(),
-            username = settings.property("database.dbUser").getString(), password = settings.property("database.dbPassword").getString())
+    DatabaseFactory.init(jdbcDriver, jdbcUrl, username, password)
     install(DefaultHeaders)
     install(DropwizardMetrics) {
         val reporter = Slf4jReporter.forRegistry(registry)
