@@ -57,21 +57,22 @@ repositories {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile "io.ktor:ktor-server-netty:$ktor_version"
-    compile "io.ktor:ktor-metrics:$ktor_version"
-    compile "io.ktor:ktor-locations:$ktor_version"
-    compile "io.ktor:ktor-gson:$ktor_version"
-    compile "io.ktor:ktor-client-core:$ktor_version"
-    compile "io.ktor:ktor-client-apache:$ktor_version"
-    compile "ch.qos.logback:logback-classic:1.2.3"
-    compile 'org.jetbrains.exposed:exposed:0.17.7'
-    compile 'com.zaxxer:HikariCP:3.3.1'
-    testCompile group: 'org.testcontainers', name: 'postgresql', version: '1.12.4'
-    testCompile group: 'org.testcontainers', name: 'junit-jupiter', version: '1.12.4'
-    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
-    testCompile "io.ktor:ktor-server-test-host:$ktor_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "io.ktor:ktor-server-netty:$ktor_version"
+    implementation "io.ktor:ktor-metrics:$ktor_version"
+    implementation "io.ktor:ktor-locations:$ktor_version"
+    implementation "io.ktor:ktor-gson:$ktor_version"
+    implementation "io.ktor:ktor-client-core:$ktor_version"
+    implementation "io.ktor:ktor-client-apache:$ktor_version"
+    implementation 'ch.qos.logback:logback-classic:1.2.3'
+    implementation 'org.jetbrains.exposed:exposed:0.17.7'
+    implementation 'com.zaxxer:HikariCP:3.3.1'
     implementation "io.ktor:ktor-client-auth:$ktor_version"
-    testCompile group: 'org.assertj', name: 'assertj-core', version: '3.12.2'
-    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.2'
+    implementation 'org.postgresql:postgresql:42.2.9'
+    implementation 'org.kodein.di:kodein-di-generic-jvm:6.5.0'
+    testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.12.4'
+    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: '1.12.4'
+    testImplementation group: 'io.ktor', name: 'ktor-server-test-host', version: "$ktor_version"
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.14.0'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.2'
 }
