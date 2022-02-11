@@ -9,7 +9,7 @@
   <version>0.1-SNAPSHOT</version>
 
   <properties>
-    <vertx.version>3.7.1</vertx.version>
+    <vertx.version>3.9.4</vertx.version>
     <vertx-maven-plugin.version>1.0.18</vertx-maven-plugin.version>
     <vertx.verticle>io.vertx.apigateway.component.ApiGatewayVerticle</vertx.verticle>
   </properties>
